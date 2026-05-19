@@ -1,3 +1,8 @@
+import { RouterProvider } from 'react-router-dom';
+import { useAuthBootstrap } from '@/features/auth/useAuthBootstrap';
+import { appRouter } from './router';
+
 export function App() {
-  return <div>Hello Nalhuitad</div>;
+  useAuthBootstrap();
+  return <RouterProvider router={appRouter} />;
 }
