@@ -6,6 +6,7 @@ import { AppShell } from '@/shared/components/AppShell';
 import { PlaceholderScreen } from '@/shared/components/PlaceholderScreen';
 import { MasMenu } from '@/shared/components/MasMenu';
 
+// eslint-disable-next-line react-refresh/only-export-components
 function MasSubScreen() {
   const { screen } = useParams<{ screen: string }>();
   const label = screen ? screen.charAt(0).toUpperCase() + screen.slice(1) : 'Más';
