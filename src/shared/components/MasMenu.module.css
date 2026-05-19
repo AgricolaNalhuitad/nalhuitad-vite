@@ -1,0 +1,49 @@
+.root {
+  padding: 24px 16px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0 0 16px;
+  color: var(--text-1);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background: var(--sep);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+.item {
+  display: block;
+  padding: 14px 16px;
+  background: var(--bg-card);
+  color: var(--text-1);
+  font-size: 15px;
+}
+
+.item:hover {
+  background: var(--bg-card-h);
+}
+
+.signOut {
+  width: 100%;
+  padding: 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--red);
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.signOut:hover {
+  background: var(--bg-card-h);
+}
