@@ -22,9 +22,11 @@ export function LotesDashboard({ lots }: Props) {
   const { totalActivo, pct, segments } = useMemo(() => {
     const total = totalEnProduccion(lots);
     const pct = pctCapacidad(total);
-    const stagesWithCount = ACTIVE_STAGES
-      .map((s) => ({ stage: s, count: countByStage(lots, s) }))
-      .filter((s) => s.count > 0);
+    const stagesWithCount = ACTIVE_STAGES.reduce<{ stage: Stage; count: number }[]>((acc, s) => {
+      const count = countByStage(lots, s);
+      if (count > 0) acc.push({ stage: s, count });
+      return acc;
+    }, []);
     const totalDonut = stagesWithCount.reduce((a, s) => a + s.count, 0) || 1;
     const segments = stagesWithCount.map((s, i) => {
       const arc = (s.count / totalDonut) * C_IN;

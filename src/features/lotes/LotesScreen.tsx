@@ -19,7 +19,7 @@ function SkeletonList() {
 }
 
 function sortByStageAndDate(lots: Lot[]): Lot[] {
-  return [...lots].sort((a, b) => {
+  return lots.toSorted((a, b) => {
     const diff = STAGE_ORDER.indexOf(a.stage) - STAGE_ORDER.indexOf(b.stage);
     if (diff !== 0) return diff;
     return (a.date || '').localeCompare(b.date || '');
