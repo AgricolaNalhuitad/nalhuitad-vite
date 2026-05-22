@@ -6,6 +6,9 @@ import { AppShell } from '@/shared/components/AppShell';
 import { PlaceholderScreen } from '@/shared/components/PlaceholderScreen';
 import { MasMenu } from '@/shared/components/MasMenu';
 import { LotesScreen } from '@/features/lotes/LotesScreen';
+import { LotDetailScreen } from '@/features/lotes/LotDetailScreen';
+import { CreateLotScreen } from '@/features/lotes/CreateLotScreen';
+import { EditLotScreen } from '@/features/lotes/EditLotScreen';
 
 // eslint-disable-next-line react-refresh/only-export-components
 function MasSubScreen() {
@@ -32,12 +35,14 @@ export const appRouter = createBrowserRouter([
     ),
     children: [
       { index: true, element: <Navigate to="/lotes" replace /> },
-      { path: 'lotes', element: <LotesScreen /> },
-      { path: 'lotes/:id', element: <PlaceholderScreen name="Detalle lote" /> },
-      { path: 'dashboard', element: <PlaceholderScreen name="Dashboard" /> },
-      { path: 'alertas', element: <PlaceholderScreen name="Alertas" /> },
+      { path: 'lotes',            element: <LotesScreen /> },
+      { path: 'lotes/nuevo',      element: <CreateLotScreen /> },
+      { path: 'lotes/:id',        element: <LotDetailScreen /> },
+      { path: 'lotes/:id/editar', element: <EditLotScreen /> },
+      { path: 'dashboard',  element: <PlaceholderScreen name="Dashboard" /> },
+      { path: 'alertas',    element: <PlaceholderScreen name="Alertas" /> },
       { path: 'produccion', element: <PlaceholderScreen name="Producción" /> },
-      { path: 'mas', element: <MasMenu /> },
+      { path: 'mas',        element: <MasMenu /> },
       { path: 'mas/:screen', element: <MasSubScreen /> },
     ],
   },

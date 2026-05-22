@@ -1,44 +1,30 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useLot } from './useLot';
 import { useUpdateLot } from './useLotMutations';
+import type { Lot } from './types';
 import styles from './EditLotScreen.module.css';
 
-export function EditLotScreen() {
-  const { id } = useParams<{ id: string }>();
+interface FormProps {
+  id: string;
+  lot: Lot;
+}
+
+function EditLotForm({ id, lot }: FormProps) {
   const navigate = useNavigate();
-  const { lot, isLoading } = useLot(id!);
-  const { mutateAsync, isPending } = useUpdateLot(id!);
+  const [name, setName] = useState(lot.name);
+  const [variety, setVariety] = useState(lot.variety);
+  const [invernadero, setInvernadero] = useState<'A' | 'B'>(
+    (lot.location?.invernadero as 'A' | 'B') ?? 'A',
+  );
+  const [tipo, setTipo] = useState(lot.location?.tipo ?? 'piscina');
+  const [identificador, setIdentificador] = useState(lot.location?.identificador ?? '');
 
-  const [name, setName] = useState('');
-  const [variety, setVariety] = useState('');
-  const [invernadero, setInvernadero] = useState<'A' | 'B'>('A');
-  const [tipo, setTipo] = useState('piscina');
-  const [identificador, setIdentificador] = useState('');
-
-  useEffect(() => {
-    if (lot) {
-      setName(lot.name);
-      setVariety(lot.variety);
-      if (lot.location) {
-        setInvernadero(lot.location.invernadero as 'A' | 'B');
-        setTipo(lot.location.tipo);
-        setIdentificador(lot.location.identificador);
-      }
-    }
-  }, [lot]);
-
-  if (isLoading) {
-    return <div className={styles.skeleton} data-testid="edit-skeleton" />;
-  }
+  const { mutateAsync, isPending } = useUpdateLot(id);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    await mutateAsync({
-      name,
-      variety,
-      location: { invernadero, tipo, identificador },
-    });
+    await mutateAsync({ name, variety, location: { invernadero, tipo, identificador } });
     navigate(`/lotes/${id}`);
   }
 
@@ -108,4 +94,15 @@ export function EditLotScreen() {
       </form>
     </div>
   );
+}
+
+export function EditLotScreen() {
+  const { id } = useParams<{ id: string }>();
+  const { lot, isLoading } = useLot(id!);
+
+  if (isLoading || !lot) {
+    return <div className={styles.skeleton} data-testid="edit-skeleton" />;
+  }
+
+  return <EditLotForm id={id!} lot={lot} />;
 }

@@ -29,7 +29,7 @@ describe('subscribeLot', () => {
   it('invoca onData con el lote normalizado al recibir snapshot que existe', () => {
     const mockUnsubscribe = vi.fn();
     mockOnSnapshot.mockImplementation((_ref, onNext) => {
-      (onNext as Function)({
+      (onNext as (snap: unknown) => void)({
         exists: () => true,
         id: 'lot1',
         data: () => ({ name: 'Milena', stage: 'almacigo', quantity: 10, date: '2026-01-01' }),
@@ -49,7 +49,7 @@ describe('subscribeLot', () => {
 
   it('invoca onData con null cuando el doc no existe', () => {
     mockOnSnapshot.mockImplementation((_ref, onNext) => {
-      (onNext as Function)({ exists: () => false, id: 'lot-gone', data: () => null });
+      (onNext as (snap: unknown) => void)({ exists: () => false, id: 'lot-gone', data: () => null });
       return vi.fn();
     });
 
@@ -61,7 +61,7 @@ describe('subscribeLot', () => {
   it('invoca onError cuando Firestore emite error', () => {
     const fakeError = new Error('permission-denied');
     mockOnSnapshot.mockImplementation((_ref, _onNext, onError) => {
-      (onError as Function)(fakeError);
+      (onError as unknown as (err: Error) => void)(fakeError);
       return vi.fn();
     });
 
