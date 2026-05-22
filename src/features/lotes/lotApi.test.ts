@@ -20,7 +20,7 @@ const mockArrayUnion = vi.mocked(arrayUnion);
 beforeEach(() => {
   mockDoc.mockReturnValue({} as ReturnType<typeof doc>);
   mockCollection.mockReturnValue({} as ReturnType<typeof collection>);
-  mockArrayUnion.mockImplementation((...items) => items as ReturnType<typeof arrayUnion>);
+  mockArrayUnion.mockImplementation((...items) => items as unknown as ReturnType<typeof arrayUnion>);
 });
 
 // ── subscribeLot ──────────────────────────────────────────────────────────────
@@ -96,9 +96,9 @@ describe('createLot', () => {
 
     expect(mockAddDoc).toHaveBeenCalledOnce();
     const [, data] = mockAddDoc.mock.calls[0];
-    expect((data as Record<string, unknown>).name).toBe('Fantasía Sur');
-    expect((data as Record<string, unknown>).stage).toBe('almacigo');
-    expect((data as Record<string, unknown>).quantity).toBe(15);
+    expect((data as unknown as Record<string, unknown>).name).toBe('Fantasía Sur');
+    expect((data as unknown as Record<string, unknown>).stage).toBe('almacigo');
+    expect((data as unknown as Record<string, unknown>).quantity).toBe(15);
     expect(id).toBe('new-lot-123');
   });
 });
@@ -111,7 +111,7 @@ describe('updateLot', () => {
     await updateLot('lot1', input);
     expect(mockUpdateDoc).toHaveBeenCalledOnce();
     const [, data] = mockUpdateDoc.mock.calls[0];
-    expect((data as Record<string, unknown>).name).toBe('Nombre Nuevo');
+    expect((data as unknown as Record<string, unknown>).name).toBe('Nombre Nuevo');
   });
 });
 
@@ -127,8 +127,8 @@ describe('advanceStage', () => {
     await advanceStage('lot1', input);
     expect(mockUpdateDoc).toHaveBeenCalledOnce();
     const [, data] = mockUpdateDoc.mock.calls[0];
-    expect((data as Record<string, unknown>).stage).toBe('transplante');
-    expect((data as Record<string, unknown>).currentQuantity).toBe(2700);
+    expect((data as unknown as Record<string, unknown>).stage).toBe('transplante');
+    expect((data as unknown as Record<string, unknown>).currentQuantity).toBe(2700);
   });
 });
 
@@ -140,7 +140,7 @@ describe('registerHarvest', () => {
     await registerHarvest('lot1', input);
     expect(mockUpdateDoc).toHaveBeenCalledOnce();
     const [, data] = mockUpdateDoc.mock.calls[0];
-    expect((data as Record<string, unknown>).stage).toBe('cosecha');
+    expect((data as unknown as Record<string, unknown>).stage).toBe('cosecha');
   });
 });
 
@@ -152,6 +152,6 @@ describe('registerRaleo', () => {
     await registerRaleo('lot1', 2500, input);
     expect(mockUpdateDoc).toHaveBeenCalledOnce();
     const [, data] = mockUpdateDoc.mock.calls[0];
-    expect((data as Record<string, unknown>).currentQuantity).toBe(2200); // 2500 - 300
+    expect((data as unknown as Record<string, unknown>).currentQuantity).toBe(2200); // 2500 - 300
   });
 });
