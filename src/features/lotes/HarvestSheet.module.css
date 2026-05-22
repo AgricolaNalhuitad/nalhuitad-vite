@@ -1,0 +1,75 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 100;
+  display: flex;
+  align-items: flex-end;
+}
+
+.sheet {
+  width: 100%;
+  background: var(--bg-card);
+  border-radius: 20px 20px 0 0;
+  padding: 24px 20px 40px;
+}
+
+.title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-1);
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.form { display: flex; flex-direction: column; gap: 14px; }
+
+.label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-2);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.input {
+  padding: 12px;
+  border-radius: 10px;
+  border: 0.5px solid var(--border);
+  background: var(--bg-input);
+  color: var(--text-1);
+  font-size: 15px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.actions { display: flex; gap: 10px; margin-top: 6px; }
+
+.cancelBtn {
+  flex: 1;
+  padding: 13px;
+  border-radius: 12px;
+  border: 0.5px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-1);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.submitBtn {
+  flex: 1;
+  padding: 13px;
+  border-radius: 12px;
+  border: none;
+  background: var(--green);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.submitBtn:disabled { opacity: 0.5; cursor: not-allowed; }
