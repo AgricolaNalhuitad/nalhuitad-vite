@@ -53,3 +53,41 @@ export interface Lot {
   raleos: RaleoEntry[];
   childrenIds: string[];
 }
+
+/** Input para crear un nuevo lote */
+export interface NewLotInput {
+  name: string;
+  variety: string;
+  date: string;           // ISO YYYY-MM-DD
+  quantity: number;       // bandejas de almácigo
+  location: Location;
+}
+
+/** Input para editar campos básicos del lote */
+export interface UpdateLotInput {
+  name?: string;
+  variety?: string;
+  location?: Location;
+}
+
+/** Input para avanzar a la siguiente etapa */
+export interface AdvanceStageInput {
+  newStage: Stage;
+  date: string;           // ISO YYYY-MM-DD
+  quantity?: number;      // nueva cantidad de plantas (si cambia)
+  location?: Location;    // nueva ubicación (si cambia)
+  notes?: string;
+}
+
+/** Input para registrar cosecha */
+export interface HarvestInput {
+  date: string;           // ISO YYYY-MM-DD
+  notes?: string;
+}
+
+/** Input para registrar raleo */
+export interface RaleoInput {
+  cantidadRaleada: number;
+  fecha: string;          // ISO YYYY-MM-DD
+  destino?: Location;
+}

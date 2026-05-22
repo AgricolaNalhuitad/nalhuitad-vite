@@ -26,7 +26,11 @@ vi.mock('firebase/firestore', () => ({
   persistentLocalCache: vi.fn(() => ({})),
   persistentMultipleTabManager: vi.fn(() => ({})),
   collection: vi.fn(() => ({})),
+  doc: vi.fn(() => ({})),
   onSnapshot: vi.fn(() => vi.fn()),
+  addDoc: vi.fn(() => Promise.resolve({ id: 'new-lot-id' })),
+  updateDoc: vi.fn(() => Promise.resolve()),
+  arrayUnion: vi.fn((...items: unknown[]) => items),
 }));
 
 vi.mock('@/lib/firebase', () => ({
