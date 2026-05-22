@@ -1,0 +1,140 @@
+.card {
+  background: var(--bg-card);
+  border: 0.5px solid var(--border);
+  border-radius: 14px;
+  padding: 16px 18px;
+  margin-bottom: 14px;
+}
+
+.donutRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.donutSvg {
+  flex-shrink: 0;
+}
+
+.stats {
+  flex: 1;
+  min-width: 0;
+}
+
+.totalLabel {
+  font-size: 10px;
+  color: var(--text-3);
+  margin-bottom: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+}
+
+.totalNumber {
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--text-1);
+  font-family: 'DM Mono', monospace;
+  line-height: 1;
+  margin-bottom: 5px;
+}
+
+.activeLots {
+  font-size: 11px;
+  color: var(--text-2);
+  margin-bottom: 8px;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 3px;
+}
+
+.legendDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.legendLabel {
+  font-size: 10px;
+  color: var(--text-2);
+}
+
+.sep {
+  border-top: 0.5px solid var(--sep);
+  margin-bottom: 12px;
+}
+
+.bars {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-bottom: 14px;
+}
+
+.barRow { /* layout container */ }
+
+.barHeader {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 3px;
+}
+
+.barLabel {
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.barValue {
+  font-size: 11px;
+  font-family: 'DM Mono', monospace;
+  font-weight: 700;
+}
+
+.barTrack {
+  height: 5px;
+  background: var(--bg-card-h);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.barFill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.4s;
+}
+
+.capacityRow {
+  background: var(--bg-card-h);
+  border-radius: 10px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.capacityLabel {
+  font-size: 10px;
+  color: var(--green);
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.capacityValue {
+  font-size: 12px;
+  color: var(--text-1);
+  font-family: 'DM Mono', monospace;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+.capacityMuted {
+  color: var(--text-3);
+  font-weight: 400;
+}
