@@ -77,7 +77,7 @@ describe('subscribeLotes', () => {
   it('invoca onData con lots normalizados al recibir snapshot', () => {
     const mockUnsubscribe = vi.fn();
     mockOnSnapshot.mockImplementation((_ref, onNext) => {
-      (onNext as Function)({
+      (onNext as (snap: unknown) => void)({
         docs: [
           {
             id: 'lot1',
@@ -101,7 +101,7 @@ describe('subscribeLotes', () => {
   it('invoca onError cuando Firestore emite error', () => {
     const fakeError = new Error('permission-denied');
     mockOnSnapshot.mockImplementation((_ref, _onNext, onError) => {
-      (onError as Function)(fakeError);
+      (onError as (err: unknown) => void)(fakeError);
       return vi.fn();
     });
 

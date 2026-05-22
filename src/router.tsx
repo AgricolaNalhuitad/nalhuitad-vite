@@ -5,6 +5,7 @@ import { LoginScreen } from '@/features/auth/LoginScreen';
 import { AppShell } from '@/shared/components/AppShell';
 import { PlaceholderScreen } from '@/shared/components/PlaceholderScreen';
 import { MasMenu } from '@/shared/components/MasMenu';
+import { LotesScreen } from '@/features/lotes/LotesScreen';
 
 // eslint-disable-next-line react-refresh/only-export-components
 function MasSubScreen() {
@@ -31,7 +32,8 @@ export const appRouter = createBrowserRouter([
     ),
     children: [
       { index: true, element: <Navigate to="/lotes" replace /> },
-      { path: 'lotes', element: <PlaceholderScreen name="Lotes" /> },
+      { path: 'lotes', element: <LotesScreen /> },
+      { path: 'lotes/:id', element: <PlaceholderScreen name="Detalle lote" /> },
       { path: 'dashboard', element: <PlaceholderScreen name="Dashboard" /> },
       { path: 'alertas', element: <PlaceholderScreen name="Alertas" /> },
       { path: 'produccion', element: <PlaceholderScreen name="Producción" /> },

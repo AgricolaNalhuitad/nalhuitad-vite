@@ -26,13 +26,13 @@ export function LotesDashboard({ lots }: Props) {
       .map((s) => ({ stage: s, count: countByStage(lots, s) }))
       .filter((s) => s.count > 0);
     const totalDonut = stagesWithCount.reduce((a, s) => a + s.count, 0) || 1;
-    let offset = 38;
-    const segments = stagesWithCount.map((s) => {
+    const segments = stagesWithCount.map((s, i) => {
       const arc = (s.count / totalDonut) * C_IN;
       const gap = C_IN - arc;
-      const seg = { stage: s.stage, count: s.count, arc, gap, offset };
-      offset -= arc;
-      return seg;
+      const priorArcSum = stagesWithCount
+        .slice(0, i)
+        .reduce((sum, prev) => sum + (prev.count / totalDonut) * C_IN, 0);
+      return { stage: s.stage, count: s.count, arc, gap, offset: 38 - priorArcSum };
     });
     return { totalActivo: total, pct, segments };
   }, [lots]);

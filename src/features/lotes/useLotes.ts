@@ -12,8 +12,6 @@ export function useLotes() {
   const [isListening, setIsListening] = useState(true);
 
   useEffect(() => {
-    setFirestoreError(null);
-    setIsListening(true);
     return subscribeLotes(
       (lots) => {
         setIsListening(false);
@@ -26,7 +24,11 @@ export function useLotes() {
     );
   }, [qc, retryCount]);
 
-  const retry = useCallback(() => setRetryCount((n) => n + 1), []);
+  const retry = useCallback(() => {
+    setFirestoreError(null);
+    setIsListening(true);
+    setRetryCount((n) => n + 1);
+  }, []);
 
   const { data } = useQuery<Lot[]>({
     queryKey: LOTES_QUERY_KEY,
