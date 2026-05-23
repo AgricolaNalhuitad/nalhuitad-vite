@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx skills@latest *)",
+      "Bash(pnpm dlx *)",
+      "Bash(claude mcp *)",
+      "Skill(mempalace:status)",
+      "Skill(mempalace:mempalace)",
+      "mcp__plugin_mempalace_mempalace__mempalace_status",
+      "mcp__plugin_mempalace_mempalace__mempalace_kg_stats",
+      "mcp__plugin_mempalace_mempalace__mempalace_graph_stats",
+      "Skill(mempalace:mine)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git remote *)",
+      "Bash(git push *)",
+      "Bash(pnpm typecheck *)",
+      "Bash(pnpm test:run *)",
+      "Bash(pnpm lint *)",
+      "WebFetch(domain:docs.anthropic.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebSearch",
+      "Bash(pnpm react-doctor *)",
+      "Bash(pnpm update *)",
+      "Bash(git stash *)"
+    ]
+  }
+}
