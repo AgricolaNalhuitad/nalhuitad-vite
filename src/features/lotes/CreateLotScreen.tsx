@@ -8,7 +8,7 @@ export function CreateLotScreen() {
   const today = new Date().toISOString().slice(0, 10);
 
   const [name, setName] = useState('');
-  const [variety, setVariety] = useState('');
+  const [variety, setVariety] = useState('Milena');
   const [quantity, setQuantity] = useState('');
   const [date, setDate] = useState(today);
   const [invernadero, setInvernadero] = useState<'A' | 'B'>('A');
