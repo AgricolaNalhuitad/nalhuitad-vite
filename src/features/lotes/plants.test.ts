@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { toPlants, daysSince, formatDate, PLANTS_PER_TRAY_DEFAULT } from './plants';
+import { toPlants, daysSince, formatDate, PLANTS_PER_TRAY_DEFAULT, lotPlantasIniciales } from './plants';
 
 describe('PLANTS_PER_TRAY_DEFAULT', () => {
   it('es 135', () => {
@@ -18,6 +18,22 @@ describe('toPlants', () => {
 
   it('NaN → 0 (sin crash)', () => {
     expect(toPlants(NaN)).toBe(0);
+  });
+});
+
+describe('lotPlantasIniciales', () => {
+  const base = { quantity: 21, currentQuantity: 2835, id: 'x', name: '', date: '', stage: 'almacigo' as const, variety: '', location: null, stageHistory: [], raleos: [], childrenIds: [] };
+
+  it('lote raíz (sin parentId): devuelve toPlants(quantity) — bandejas × 135', () => {
+    expect(lotPlantasIniciales(base)).toBe(2835); // 21 × 135
+  });
+
+  it('lote hijo (parentId presente): devuelve quantity directamente — ya son plantas', () => {
+    expect(lotPlantasIniciales({ ...base, quantity: 385, parentId: 'padre-1' })).toBe(385);
+  });
+
+  it('NaN en lote raíz → 0 (sin crash)', () => {
+    expect(lotPlantasIniciales({ ...base, quantity: NaN })).toBe(0);
   });
 });
 

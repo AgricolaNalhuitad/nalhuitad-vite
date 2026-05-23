@@ -22,7 +22,8 @@
       "WebSearch",
       "Bash(pnpm react-doctor *)",
       "Bash(pnpm update *)",
-      "Bash(git stash *)"
+      "Bash(git stash *)",
+      "Bash(pnpm dev *)"
     ]
   }
 }

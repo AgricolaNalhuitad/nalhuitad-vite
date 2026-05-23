@@ -154,4 +154,18 @@ describe('registerRaleo', () => {
     const [, data] = mockUpdateDoc.mock.calls[0];
     expect((data as unknown as Record<string, unknown>).currentQuantity).toBe(2200); // 2500 - 300
   });
+
+  it('NO crea documento hijo — addDoc nunca es llamado', async () => {
+    const input: RaleoInput = { cantidadRaleada: 500, fecha: '2026-03-15' };
+    await registerRaleo('lot1', 3000, input);
+    expect(mockAddDoc).not.toHaveBeenCalled();
+  });
+
+  it('agrega entrada al array raleos del lote padre', async () => {
+    const input: RaleoInput = { cantidadRaleada: 200, fecha: '2026-03-20' };
+    await registerRaleo('lot1', 2000, input);
+    expect(mockUpdateDoc).toHaveBeenCalledOnce();
+    const [, data] = mockUpdateDoc.mock.calls[0];
+    expect((data as unknown as Record<string, unknown>).raleos).toBeDefined();
+  });
 });

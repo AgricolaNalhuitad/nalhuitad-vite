@@ -22,6 +22,7 @@ export function normalizeLot(doc: LotDoc): Lot {
     stageHistory:    doc.stageHistory ?? [],
     raleos:          doc.raleos ?? [],
     childrenIds:     doc.childrenIds ?? [],
+    ...(doc.parentId !== undefined && { parentId: doc.parentId }),
   };
 }
 

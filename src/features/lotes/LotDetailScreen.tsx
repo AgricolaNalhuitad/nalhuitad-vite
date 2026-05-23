@@ -5,7 +5,7 @@ import { AdvanceStageSheet } from './AdvanceStageSheet';
 import { HarvestSheet } from './HarvestSheet';
 import { RaleoSheet } from './RaleoSheet';
 import { STAGE_LABELS, STAGE_CSS_VAR } from './stages';
-import { formatDate, toPlants } from './plants';
+import { formatDate, lotPlantasIniciales } from './plants';
 import styles from './LotDetailScreen.module.css';
 
 type ActiveSheet = 'advance' | 'harvest' | 'raleo' | null;
@@ -69,7 +69,7 @@ export function LotDetailScreen() {
       <div className={styles.statsRow}>
         <div className={styles.stat}>
           <p className={styles.statLabel}>Sembradas</p>
-          <p className={styles.statValue}>{toPlants(lot.quantity).toLocaleString('es-CL')}</p>
+          <p className={styles.statValue}>{lotPlantasIniciales(lot).toLocaleString('es-CL')}</p>
         </div>
         <div className={styles.stat}>
           <p className={styles.statLabel}>En producción</p>

@@ -82,6 +82,21 @@ describe('LotDetailScreen', () => {
     expect(screen.getByText('En producción')).toBeInTheDocument();
   });
 
+  it('lote raíz: Sembradas muestra bandejas × 135 (no quantity crudo)', () => {
+    // quantity=21 bandejas → 21×135=2.835 plantas
+    mockHook({ lot: makeLot({ quantity: 21 }) });
+    renderScreen();
+    expect(screen.getByText(/2\.835|2835/)).toBeInTheDocument();
+  });
+
+  it('lote hijo (parentId): Sembradas muestra quantity directamente sin multiplicar', () => {
+    // quantity=385 ya son plantas — NO debe mostrar 385×135=51.975
+    mockHook({ lot: makeLot({ quantity: 385, parentId: 'padre-1' }) });
+    renderScreen();
+    expect(screen.getByText(/385/)).toBeInTheDocument();
+    expect(screen.queryByText(/51\.975|51975/)).not.toBeInTheDocument();
+  });
+
   it('botón "Avanzar etapa" está habilitado en almacigo', () => {
     mockHook({ lot: makeLot({ stage: 'almacigo' }) });
     renderScreen();

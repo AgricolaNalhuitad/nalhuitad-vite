@@ -52,6 +52,7 @@ export interface Lot {
   stageHistory: StageHistoryEntry[];
   raleos: RaleoEntry[];
   childrenIds: string[];
+  parentId?: string;
 }
 
 /** Input para crear un nuevo lote */
