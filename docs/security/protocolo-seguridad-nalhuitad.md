@@ -32,6 +32,7 @@ Está organizado en tres horizontes temporales: **Horizonte 1** son los controle
   - [2.5 Auditoría de dependencias](#25-auditoría-de-dependencias)
   - [2.6 Backup diario a Google Cloud Storage](#26-backup-diario-a-google-cloud-storage)
   - [2.7 Runbook de respuesta a incidentes](#27-runbook-de-respuesta-a-incidentes)
+  - [2.8 Gestión de API keys de terceros](#28-gestión-de-api-keys-de-terceros)
 - [3. Horizonte 2 — Llegada de sensores LilyGO](#3-horizonte-2--llegada-de-sensores-lilygo)
   - [3.1 Identidad por dispositivo](#31-identidad-por-dispositivo)
   - [3.2 Validación de lecturas en ingest](#32-validación-de-lecturas-en-ingest)
@@ -67,6 +68,7 @@ Está organizado en tres horizontes temporales: **Horizonte 1** son los controle
 | claude-code-security-review en CI | Activo | `.github/workflows/` |
 | ECC AgentShield score 97/100 | Activo | última corrida verificada |
 | Deny list configurada | Activo | settings.local.json |
+| API keys de terceros en variables de entorno del sistema | Activo | `~/.mcp.json` usa `${env:FIRECRAWL_API_KEY}` — ver §2.8 |
 
 ### Pendiente (cubierto por este documento)
 
@@ -554,6 +556,95 @@ Lo que debió detectar antes y no lo hizo.
 - [ ] Test nuevo que hubiera atrapado esto
 ```
 
+### 2.8 Gestión de API keys de terceros
+
+**Regla no negociable**: ninguna API key de proveedor externo debe aparecer en texto plano en ningún archivo de configuración, versionado o no (`.mcp.json`, `.env.local`, `settings.json`, `settings.local.json`, ni cualquier otro).
+
+**Por qué**: estos archivos terminan en backups, snapshots, capturas de pantalla, logs de terminal y, más frecuentemente de lo esperado, en commits accidentales. Una API key expuesta de Firecrawl o Anthropic puede generar costos ilimitados en segundos y no tiene rollback posible salvo revocarla.
+
+#### Inventario de API keys de terceros
+
+| Variable | Proveedor | Archivo que la referencia | Alcance |
+|---|---|---|---|
+| `FIRECRAWL_API_KEY` | Firecrawl | `~/.mcp.json` | Variable de entorno Usuario (máquina de Grigor) |
+| `ANTHROPIC_API_KEY` | Anthropic | Claude Code / SDK apps | Variable de entorno Usuario |
+| _(cualquier key futura)_ | _(tercero)_ | _(el archivo que la necesite)_ | Variable de entorno Usuario o Machine |
+
+#### Formato correcto en archivos de configuración
+
+En lugar del valor hardcodeado, usar la sintaxis de referencia a variable de entorno:
+
+```json
+{
+  "env": {
+    "FIRECRAWL_API_KEY": "${env:FIRECRAWL_API_KEY}",
+    "ANTHROPIC_API_KEY": "${env:ANTHROPIC_API_KEY}"
+  }
+}
+```
+
+Claude Code interpreta `${env:NOMBRE}` en tiempo de ejecución y lo reemplaza con el valor de la variable del sistema. El archivo de configuración queda limpio y es seguro versionar.
+
+#### Registrar una variable de entorno (PowerShell — una vez por máquina)
+
+```powershell
+# Scope User: persiste entre sesiones, no requiere permisos de administrador
+[System.Environment]::SetEnvironmentVariable(
+    "FIRECRAWL_API_KEY",
+    "fc-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    [System.EnvironmentVariableTarget]::User
+)
+
+[System.Environment]::SetEnvironmentVariable(
+    "ANTHROPIC_API_KEY",
+    "sk-ant-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    [System.EnvironmentVariableTarget]::User
+)
+```
+
+> **IMPORTANTE**: cerrar y reabrir el terminal después de ejecutar. Las variables registradas con `SetEnvironmentVariable` no se propagan a sesiones ya abiertas.
+
+Para servidores o CI donde múltiples usuarios comparten la máquina, usar scope `Machine` en lugar de `User` (requiere ejecutar PowerShell como Administrador).
+
+#### Verificar que la variable está correctamente configurada
+
+```powershell
+# 1. Confirmar que está registrada en el sistema (nivel User)
+[System.Environment]::GetEnvironmentVariable("FIRECRAWL_API_KEY", "User")
+[System.Environment]::GetEnvironmentVariable("ANTHROPIC_API_KEY", "User")
+
+# 2. Confirmar que está disponible en la sesión actual
+$env:FIRECRAWL_API_KEY
+$env:ANTHROPIC_API_KEY
+
+# 3. Confirmar que el archivo de configuración NO contiene el valor en texto plano
+Select-String -Path "$env:USERPROFILE\.mcp.json" -Pattern "fc-|sk-ant-"
+# Resultado esperado: sin coincidencias
+```
+
+Si el paso 1 devuelve el valor pero el paso 2 devuelve vacío: la terminal fue abierta antes de registrar la variable — cerrar y reabrir.
+
+Si el paso 3 encuentra coincidencias: hay una key en texto plano — actuar según el procedimiento de rotación inmediata más abajo.
+
+#### Política para keys futuras
+
+Cada vez que se agregue un nuevo servicio de terceros que requiera una API key:
+
+1. **Nunca** copiar el valor directamente en el archivo de configuración
+2. Registrar la variable con `SetEnvironmentVariable` scope `User`
+3. Referenciarla con `${env:NOMBRE_VAR}` en el archivo que la necesite
+4. Añadir una fila al inventario de este §2.8
+5. Si es una máquina compartida (servidor, CI), usar scope `Machine` con permisos admin
+
+#### Rotación de API keys de terceros
+
+| Trigger | Acción |
+|---|---|
+| Sospecha de exposición en texto plano | Revocar en el dashboard del proveedor primero; luego actualizar la variable con `SetEnvironmentVariable`; anotar en bitácora |
+| Rotación programada | Generar nueva key en el proveedor; actualizar la variable; verificar que el servicio responde; revocar la vieja |
+| Cambio de máquina o reinstalación | Registrar manualmente en la nueva máquina — las variables `User` no se replican ni sincronizan |
+| Key encontrada en commit accidental | Revocar inmediatamente, purgar del historial Git con `git filter-repo`, anotar como incidente en Apéndice D |
+
 ---
 
 ## 3. Horizonte 2 — Llegada de sensores LilyGO
@@ -983,6 +1074,7 @@ pnpm audit --audit-level=high --prod
 | _pendiente — mañana_ | Script `scripts/setRole.ts` con firebase-admin | Grigor + dev | Asignar `role: owner` al UID de Grigor antes de re-deployar reglas estrictas. Requiere service-account.json descargado de Console. |
 | _pendiente — mañana_ | Re-deploy reglas estrictas | Grigor + dev | Tras confirmar claim activo y validar createLot end-to-end desde la app. |
 | _pendiente — mañana_ | Post-mortem en `docs/incidents/2026-05-24-rules-deploy-missing-claim.md` | Grigor + Claude | Per runbook §2.7 paso 5. Documentar timeline, causa raíz, prevención (test con claims vacíos, pre-flight de claim assignment en protocolo). |
+| 2026-05-24 | §2.8 agregado: política de API keys de terceros en variables de entorno del sistema | Grigor + Claude | `~/.mcp.json` tenía `FIRECRAWL_API_KEY` en texto plano. Migrado a `${env:FIRECRAWL_API_KEY}`. Política formalizada para `ANTHROPIC_API_KEY` y keys futuras. |
 | _pendiente_ | Restricción API key aplicada | _Grigor_ | §2.3 ejecutado |
 | _pendiente_ | Backup diario operativo | _Grigor_ | §2.6 ejecutado |
 | _pendiente_ | Tightening de `lotes` a write:false | _Grigor + dev_ | Después de switchover Sprint 4 |
