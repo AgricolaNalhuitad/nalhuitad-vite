@@ -1,0 +1,244 @@
+rules_version = '2';
+
+// Nalhuitad — Firestore Security Rules
+// Roles via custom claims: 'owner' (Grigor) | 'operator' (trabajadores)
+// Asignación de claims solo vía Cloud Function admin (no editable desde cliente).
+// Borrado deshabilitado en cliente: borrados auditados pasan por Cloud Function.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ============================================================
+    // HELPERS
+    // ============================================================
+    function isAuth() {
+      return request.auth != null;
+    }
+    function role() {
+      return request.auth.token.get('role', '');
+    }
+    function isOwner() {
+      return isAuth() && role() == 'owner';
+    }
+    function isOperator() {
+      return isAuth() && (role() == 'owner' || role() == 'operator');
+    }
+    function uid() {
+      return request.auth.uid;
+    }
+    function isValidStage(s) {
+      return s in ['almacigo', 'transplante', 'raleo', 'cosecha'];
+    }
+    function isValidLoteEstado(s) {
+      return s in ['activo', 'cosechado', 'descartado'];
+    }
+    function isValidUpEstado(s) {
+      return s in ['activa', 'cosechada', 'descartada', 'trasladada'];
+    }
+    function isValidInvernadero(i) {
+      return i in ['A', 'B', 'C', 'D'];
+    }
+    function isValidUbicacionId(id) {
+      // INV-D-ALM, INV-C-P01..P04, INV-A-P01..P08, INV-B-B01..B06
+      return id is string && id.matches('^INV-[A-D]-[A-Z0-9]+$');
+    }
+    function isIsoDate(d) {
+      return d is string && d.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$');
+    }
+    function unchanged(field) {
+      return resource.data.get(field, null) == request.resource.data.get(field, null);
+    }
+    function onlyFields(allowed) {
+      return request.resource.data.keys().hasOnly(allowed);
+    }
+    function hasAllFields(required) {
+      return request.resource.data.keys().hasAll(required);
+    }
+
+    // ============================================================
+    // USERS — perfil mínimo; roles reales viven en custom claims
+    // ============================================================
+    match /users/{userId} {
+      allow read: if isAuth() && (uid() == userId || isOwner());
+      allow create, update: if isOwner();
+      allow delete: if false;
+    }
+
+    // ============================================================
+    // LOTE ORIGEN — genealogía. Inmutable salvo estado/notas.
+    // ============================================================
+    match /loteOrigen/{loteId} {
+      allow read: if isOperator();
+
+      allow create: if isOperator()
+        && onlyFields([
+          'nombre', 'variedad', 'fechaSiembra', 'bandejas',
+          'cantidadInicial', 'estado', 'notas',
+          'createdAt', 'createdBy', 'lastModifiedBy', 'lastModifiedAt'
+        ])
+        && hasAllFields([
+          'nombre', 'variedad', 'fechaSiembra', 'bandejas',
+          'cantidadInicial', 'estado', 'createdAt', 'createdBy'
+        ])
+        && request.resource.data.nombre is string
+        && request.resource.data.nombre.size() > 0
+        && request.resource.data.nombre.size() <= 80
+        && request.resource.data.variedad is string
+        && request.resource.data.variedad.size() > 0
+        && isIsoDate(request.resource.data.fechaSiembra)
+        && request.resource.data.bandejas is int
+        && request.resource.data.bandejas >= 1
+        && request.resource.data.bandejas <= 100
+        // FR-004: cantidadInicial = bandejas × 135 (lechugas por bandeja, canónico)
+        && request.resource.data.cantidadInicial == request.resource.data.bandejas * 135
+        && request.resource.data.estado == 'activo'
+        && request.resource.data.createdBy == uid();
+
+      allow update: if isOperator()
+        // Genealogía inmutable
+        && unchanged('createdBy')
+        && unchanged('createdAt')
+        && unchanged('fechaSiembra')
+        && unchanged('bandejas')
+        && unchanged('cantidadInicial')
+        && unchanged('variedad')
+        && unchanged('nombre')
+        // Solo estado y notas son mutables
+        && isValidLoteEstado(request.resource.data.estado)
+        && request.resource.data.lastModifiedBy == uid()
+        && onlyFields([
+          'nombre', 'variedad', 'fechaSiembra', 'bandejas',
+          'cantidadInicial', 'estado', 'notas',
+          'createdAt', 'createdBy', 'lastModifiedBy', 'lastModifiedAt'
+        ]);
+
+      // Borrado solo vía Cloud Function (con auditoría)
+      allow delete: if false;
+    }
+
+    // ============================================================
+    // UNIDAD DE PRODUCCIÓN — presencia física.
+    // Genealogía (refLoteOrigen, parentUpId) inmutable post-creación.
+    // ============================================================
+    match /unidadesProduccion/{upId} {
+      allow read: if isOperator();
+
+      allow create: if isOperator()
+        && onlyFields([
+          'refLoteOrigen', 'ubicacionId', 'cantidad', 'etapa', 'estado',
+          'parentUpId', 'fechaIngreso', 'historial',
+          'createdAt', 'createdBy', 'lastModifiedBy', 'lastModifiedAt'
+        ])
+        && hasAllFields([
+          'refLoteOrigen', 'ubicacionId', 'cantidad', 'etapa', 'estado',
+          'fechaIngreso', 'createdAt', 'createdBy'
+        ])
+        && request.resource.data.refLoteOrigen is string
+        && request.resource.data.refLoteOrigen.size() > 0
+        && isValidUbicacionId(request.resource.data.ubicacionId)
+        && request.resource.data.cantidad is int
+        && request.resource.data.cantidad >= 1
+        && request.resource.data.cantidad <= 10000
+        && isValidStage(request.resource.data.etapa)
+        // FR-002: UP siempre nace activa
+        && request.resource.data.estado == 'activa'
+        && isIsoDate(request.resource.data.fechaIngreso)
+        && request.resource.data.createdBy == uid();
+
+      allow update: if isOperator()
+        // FR-011: genealogía intocable
+        && unchanged('refLoteOrigen')
+        && unchanged('parentUpId')
+        && unchanged('createdBy')
+        && unchanged('createdAt')
+        && unchanged('fechaIngreso')
+        // Validaciones de transición
+        && isValidUpEstado(request.resource.data.estado)
+        && isValidStage(request.resource.data.etapa)
+        && request.resource.data.cantidad is int
+        && request.resource.data.cantidad >= 0
+        // FR-031: cantidad solo decrece o se mantiene (descartes, cosechas)
+        && request.resource.data.cantidad <= resource.data.cantidad
+        && isValidUbicacionId(request.resource.data.ubicacionId)
+        && request.resource.data.lastModifiedBy == uid()
+        && onlyFields([
+          'refLoteOrigen', 'ubicacionId', 'cantidad', 'etapa', 'estado',
+          'parentUpId', 'fechaIngreso', 'historial',
+          'createdAt', 'createdBy', 'lastModifiedBy', 'lastModifiedAt'
+        ]);
+
+      allow delete: if false;
+    }
+
+    // ============================================================
+    // UBICACIONES — catálogo de 19 ubicaciones físicas (seed data)
+    // ============================================================
+    match /ubicaciones/{ubicId} {
+      allow read: if isAuth();
+      allow create, update: if isOwner()
+        && isValidUbicacionId(ubicId)
+        && onlyFields([
+          'invernadero', 'tipo', 'identificador',
+          'capacidadMaxima', 'funcion', 'estado',
+          'createdAt', 'updatedAt'
+        ])
+        && isValidInvernadero(request.resource.data.invernadero)
+        && request.resource.data.capacidadMaxima is int
+        && request.resource.data.capacidadMaxima > 0;
+      allow delete: if false;
+    }
+
+    // ============================================================
+    // COSECHAS — append-only. Corregir = nueva cosecha de signo opuesto.
+    // ============================================================
+    match /cosechas/{cosechaId} {
+      allow read: if isOperator();
+
+      allow create: if isOperator()
+        && onlyFields([
+          'refUnidadProduccion', 'refLoteOrigen',
+          'paquetes', 'descarte', 'lechugasEquivalentes',
+          'fecha', 'notas',
+          'createdAt', 'createdBy'
+        ])
+        && hasAllFields([
+          'refUnidadProduccion', 'refLoteOrigen',
+          'paquetes', 'descarte', 'lechugasEquivalentes',
+          'fecha', 'createdAt', 'createdBy'
+        ])
+        && request.resource.data.refUnidadProduccion is string
+        && request.resource.data.refLoteOrigen is string
+        && request.resource.data.paquetes is int
+        && request.resource.data.paquetes >= 0
+        && request.resource.data.paquetes <= 210
+        && request.resource.data.descarte is int
+        && request.resource.data.descarte >= 0
+        // FR-016: 1 paquete = 2 lechugas (canónico)
+        && request.resource.data.lechugasEquivalentes == request.resource.data.paquetes * 2
+        && isIsoDate(request.resource.data.fecha)
+        && request.resource.data.createdBy == uid();
+
+      allow update, delete: if false;
+    }
+
+    // ============================================================
+    // LOTES LEGACY — modelo anterior, read-only durante convivencia
+    // ============================================================
+    match /lotes/{loteId} {
+      allow read: if isOperator();
+      allow write: if false;
+    }
+
+    match /lotes_legacy/{loteId} {
+      allow read: if isOperator();
+      allow write: if false;
+    }
+
+    // ============================================================
+    // DEFAULT DENY
+    // ============================================================
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

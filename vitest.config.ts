@@ -8,10 +8,11 @@ export default mergeConfig(
       environment: 'jsdom',
       globals: true,
       setupFiles: ['./src/tests/setup.ts'],
+      exclude: ['node_modules', 'dist', 'tests/security/**'],
       coverage: {
         provider: 'v8',
         reporter: ['text', 'html'],
-        exclude: ['**/*.test.{ts,tsx}', 'src/tests/**', 'src/main.tsx', 'src/vite-env.d.ts'],
+        exclude: ['**/*.test.{ts,tsx}', 'src/tests/**', 'tests/**', 'src/main.tsx', 'src/vite-env.d.ts'],
       },
     },
   }),
