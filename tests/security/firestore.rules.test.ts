@@ -516,31 +516,86 @@ describe('cosechas (append-only)', () => {
 });
 
 // ============================================================
-// LOTES LEGACY — read-only
+// LOTES — modelo legacy ACTIVO (pre-switchover)
+// Transitorio: la app Sprint 3 sigue escribiendo aquí.
 // ============================================================
-describe('lotes legacy (read-only)', () => {
+describe('lotes (legacy activo, pre-switchover)', () => {
   beforeEach(async () => {
     await testEnv.withSecurityRulesDisabled(async (ctx) => {
       const db = ctx.firestore() as unknown as Firestore;
-      await setDoc(doc(db, 'lotes/legacy1'), { name: 'old', variety: 'Milena' });
-      await setDoc(doc(db, 'lotes_legacy/legacy2'), { name: 'archived' });
+      await setDoc(doc(db, 'lotes/legacy1'), { name: 'old', variety: 'Milena', stage: 'almacigo' });
     });
   });
 
-  it('operator can read lotes (legacy)', async () => {
+  it('operator can read lote', async () => {
     await assertSucceeds(getDoc(doc(operatorDb(), 'lotes/legacy1')));
+  });
+
+  it('operator can create new lote (Sprint 3 createLot)', async () => {
+    await assertSucceeds(
+      setDoc(doc(operatorDb(), 'lotes/new1'), {
+        name: 'Milena 24-May',
+        variety: 'Milena',
+        date: '2026-05-24',
+        quantity: 6,
+        currentQuantity: 810,
+        stage: 'almacigo',
+        location: { invernadero: 'D', tipo: 'almácigo', identificador: 'ALM' },
+        stageHistory: [{ stage: 'almacigo', date: '2026-05-24' }],
+        raleos: [],
+        childrenIds: [],
+      }),
+    );
+  });
+
+  it('operator can update lote (Sprint 3 updateLot/advanceStage)', async () => {
+    await assertSucceeds(
+      updateDoc(doc(operatorDb(), 'lotes/legacy1'), {
+        stage: 'transplante',
+        currentQuantity: 540,
+      }),
+    );
+  });
+
+  it('rejects invalid stage in write', async () => {
+    await assertFails(
+      updateDoc(doc(operatorDb(), 'lotes/legacy1'), { stage: 'germinacion' }),
+    );
+  });
+
+  it('rejects negative quantity', async () => {
+    await assertFails(
+      updateDoc(doc(operatorDb(), 'lotes/legacy1'), { quantity: -5 }),
+    );
+  });
+
+  it('denies delete from client', async () => {
+    await assertFails(deleteDoc(doc(operatorDb(), 'lotes/legacy1')));
+    await assertFails(deleteDoc(doc(ownerDb(), 'lotes/legacy1')));
+  });
+});
+
+// ============================================================
+// LOTES_LEGACY — destino del switchover, read-only definitivo
+// ============================================================
+describe('lotes_legacy (post-switchover, read-only)', () => {
+  beforeEach(async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      const db = ctx.firestore() as unknown as Firestore;
+      await setDoc(doc(db, 'lotes_legacy/legacy2'), { name: 'archived' });
+    });
   });
 
   it('operator can read lotes_legacy', async () => {
     await assertSucceeds(getDoc(doc(operatorDb(), 'lotes_legacy/legacy2')));
   });
 
-  it('denies write to lotes even by owner', async () => {
-    await assertFails(updateDoc(doc(ownerDb(), 'lotes/legacy1'), { name: 'tampered' }));
+  it('denies write even to owner', async () => {
+    await assertFails(updateDoc(doc(ownerDb(), 'lotes_legacy/legacy2'), { name: 'tampered' }));
   });
 
-  it('denies create new lote in legacy collection', async () => {
-    await assertFails(setDoc(doc(operatorDb(), 'lotes/new1'), { name: 'inject' }));
+  it('denies create in lotes_legacy', async () => {
+    await assertFails(setDoc(doc(operatorDb(), 'lotes_legacy/new1'), { name: 'inject' }));
   });
 
   it('denies delete in lotes_legacy', async () => {

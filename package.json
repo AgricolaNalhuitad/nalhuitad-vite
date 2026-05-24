@@ -14,7 +14,7 @@
     "test:run": "vitest run",
     "test:ui": "vitest --ui",
     "test:rules": "firebase emulators:exec --only firestore \"vitest run --config vitest.security.config.ts\"",
-    "rules:deploy": "firebase deploy --only firestore:rules"
+    "rules:deploy": "firebase deploy --only firestore:rules --project=nalhuitad-d6758"
   },
   "devEngines": {
     "packageManager": {

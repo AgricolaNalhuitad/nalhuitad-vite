@@ -121,8 +121,8 @@ await admin.auth().setCustomUserClaims(uid, { role: 'owner' });
 | `unidadesProduccion` | operator+ | operator+ con schema validado | operator+ excepto genealogía, cantidad solo decrece | nunca (vía CF) |
 | `cosechas` | operator+ | operator+ con `lechugasEquivalentes == paquetes × 2` | nunca | nunca |
 | `ubicaciones` | cualquier autenticado | owner con id `INV-[A-D]-XXX` | owner | nunca |
-| `lotes` (legacy) | operator+ | nunca | nunca | nunca |
-| `lotes_legacy` | operator+ | nunca | nunca | nunca |
+| `lotes` (legacy ACTIVO, pre-switchover) | operator+ | operator+ con stage/cantidad válidos | operator+ con stage/cantidad válidos | nunca |
+| `lotes_legacy` (post-switchover) | operator+ | nunca | nunca | nunca |
 | cualquier otra | nunca | nunca | nunca | nunca |
 
 #### Invariantes de dominio aplicados en reglas
@@ -137,6 +137,16 @@ await admin.auth().setCustomUserClaims(uid, { role: 'owner' });
 | `cosechas` append-only (no update, no delete) | FR-015, FR-017 — corregir vía nueva cosecha de signo opuesto |
 | `paquetes ≤ 210` por cosecha individual | Capacidad por viaje (Story 4 acceptance #4) |
 | `ubicacionId` matchea `^INV-[A-D]-[A-Z0-9]+$` | FR-024: catálogo de 19 ubicaciones |
+
+#### Estado transitorio de `lotes` (IMPORTANTE)
+
+Las reglas distinguen dos colecciones:
+
+- **`lotes`** — modelo legacy ACTIVO mientras Sprint 4 no haya ejecutado el switchover (FR-027). La app Sprint 3 escribe aquí (createLot, updateLot, advanceStage, registerHarvest, registerRaleo). Las reglas permiten create/update por operator+ con validación mínima de tipos (`stage` válido, `quantity`/`currentQuantity` enteros ≥ 0). Delete denegado siempre.
+
+- **`lotes_legacy`** — destino del switchover. Read-only definitivo desde el día 1. Hoy está vacía.
+
+**Acción de tightening (post-Sprint 4)**: cuando la migración `lotes` → `lotes_legacy` se ejecute, editar la regla de `lotes` a `allow write: if false` y redeployar. Los tests `tests/security/firestore.rules.test.ts` deben actualizarse en el mismo PR para reflejar el cierre.
 
 #### Lo que NO está en las reglas (y por qué)
 
@@ -967,8 +977,10 @@ pnpm audit --audit-level=high --prod
 | Fecha | Cambio | Autor | Razón |
 |---|---|---|---|
 | 2026-05-24 | Versión inicial del protocolo | Grigor + Claude | Setup pre-Sprint 4 |
+| 2026-05-24 | Ajuste transitorio reglas `lotes` (pre-deploy) | Grigor + Claude | Detección de que Sprint 3 escribe activamente a `lotes/`; reglas estrictas habrían roto producción. Se relajaron writes a `lotes` con validación mínima de tipos hasta que Sprint 4 ejecute el switchover. Tests subieron de 59 a 64 casos. |
+| 2026-05-24 | Firestore rules deployadas a `nalhuitad-d6758` | Grigor + Claude | §2.1 ejecutado. Dry-run limpio, 64/64 tests verdes, release activo en Console. Verificación manual de Sprint 3 pendiente. |
 | _pendiente_ | Restricción API key aplicada | _Grigor_ | §2.3 ejecutado |
-| _pendiente_ | Firestore rules deployadas | _Grigor_ | §2.1 ejecutado |
 | _pendiente_ | Backup diario operativo | _Grigor_ | §2.6 ejecutado |
+| _pendiente_ | Tightening de `lotes` a write:false | _Grigor + dev_ | Después de switchover Sprint 4 |
 
 > Cada cambio operativo del protocolo (rotación de key, ejecución de runbook, restore de backup, etc.) debe quedar registrado aquí con fecha y razón. Esta bitácora es evidencia para auditorías y para post-mortems.

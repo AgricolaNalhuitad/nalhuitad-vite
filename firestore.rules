@@ -222,13 +222,36 @@ service cloud.firestore {
     }
 
     // ============================================================
-    // LOTES LEGACY — modelo anterior, read-only durante convivencia
+    // LOTES — modelo legacy ACTIVO (pre-switchover Sprint 4)
+    //
+    // TRANSITORIO: mientras Sprint 4 no ejecute la migración
+    // `lotes` → `lotes_legacy` (FR-027), la app sigue escribiendo aquí.
+    // Validación mínima de tipos para no romper Sprint 3.
+    // ENDURECER a `allow write: if false` cuando se ejecute switchover.
     // ============================================================
     match /lotes/{loteId} {
       allow read: if isOperator();
-      allow write: if false;
+
+      allow create, update: if isOperator()
+        && (
+          !('stage' in request.resource.data.keys())
+          || isValidStage(request.resource.data.stage)
+        )
+        && (
+          !('quantity' in request.resource.data.keys())
+          || (request.resource.data.quantity is int && request.resource.data.quantity >= 0)
+        )
+        && (
+          !('currentQuantity' in request.resource.data.keys())
+          || (request.resource.data.currentQuantity is int && request.resource.data.currentQuantity >= 0)
+        );
+
+      allow delete: if false;
     }
 
+    // ============================================================
+    // LOTES LEGACY — destino del switchover, read-only definitivo
+    // ============================================================
     match /lotes_legacy/{loteId} {
       allow read: if isOperator();
       allow write: if false;
