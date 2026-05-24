@@ -979,6 +979,10 @@ pnpm audit --audit-level=high --prod
 | 2026-05-24 | Versión inicial del protocolo | Grigor + Claude | Setup pre-Sprint 4 |
 | 2026-05-24 | Ajuste transitorio reglas `lotes` (pre-deploy) | Grigor + Claude | Detección de que Sprint 3 escribe activamente a `lotes/`; reglas estrictas habrían roto producción. Se relajaron writes a `lotes` con validación mínima de tipos hasta que Sprint 4 ejecute el switchover. Tests subieron de 59 a 64 casos. |
 | 2026-05-24 | Firestore rules deployadas a `nalhuitad-d6758` | Grigor + Claude | §2.1 ejecutado. Dry-run limpio, 64/64 tests verdes, release activo en Console. Verificación manual de Sprint 3 pendiente. |
+| 2026-05-24 | **INCIDENTE SEV1 + rollback inmediato** | Grigor + Claude | Reglas estrictas deployadas requerían custom claim `role` que no estaba asignado a la cuenta de Grigor. Resultado: `permission-denied` en todas las escrituras. Grigor reportó "logout al crear lote" (era percepción; sesión Firebase Auth permanecía activa). Rollback ejecutado vía CLI a reglas permisivas (auth-only, equivalente al estado pre-deploy). Producción estabilizada en < 5 min desde reporte. |
+| _pendiente — mañana_ | Script `scripts/setRole.ts` con firebase-admin | Grigor + dev | Asignar `role: owner` al UID de Grigor antes de re-deployar reglas estrictas. Requiere service-account.json descargado de Console. |
+| _pendiente — mañana_ | Re-deploy reglas estrictas | Grigor + dev | Tras confirmar claim activo y validar createLot end-to-end desde la app. |
+| _pendiente — mañana_ | Post-mortem en `docs/incidents/2026-05-24-rules-deploy-missing-claim.md` | Grigor + Claude | Per runbook §2.7 paso 5. Documentar timeline, causa raíz, prevención (test con claims vacíos, pre-flight de claim assignment en protocolo). |
 | _pendiente_ | Restricción API key aplicada | _Grigor_ | §2.3 ejecutado |
 | _pendiente_ | Backup diario operativo | _Grigor_ | §2.6 ejecutado |
 | _pendiente_ | Tightening de `lotes` a write:false | _Grigor + dev_ | Después de switchover Sprint 4 |
