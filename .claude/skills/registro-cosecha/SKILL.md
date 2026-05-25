@@ -32,7 +32,7 @@ Solo lotes en etapa `'cosecha'` son elegibles. El lote se recibe como prop `lotI
 
 ```tsx
 // Solo habilitar el botón "Registrar cosecha" cuando:
-lot.stage === 'cosecha'
+lot.stage === 'cosecha';
 ```
 
 ---
@@ -43,14 +43,15 @@ Agregar a `HarvestInput` (en `types.ts`):
 
 ```ts
 export interface HarvestInput {
-  date: string;               // ISO YYYY-MM-DD
-  cantidadCosechada: number;  // lechugas cosechadas
-  descarte: number;           // lechugas descartadas
+  date: string; // ISO YYYY-MM-DD
+  cantidadCosechada: number; // lechugas cosechadas
+  descarte: number; // lechugas descartadas
   notes?: string;
 }
 ```
 
 Validaciones del formulario:
+
 - `cantidadCosechada` ≥ 1
 - `descarte` ≥ 0
 - `descarte` < `cantidadCosechada`
@@ -65,14 +66,14 @@ Actualizar `registerHarvest` en `lotApi.ts`:
 ```ts
 export async function registerHarvest(id: string, input: HarvestInput): Promise<void> {
   const entry = {
-    stage:             'cosecha',
-    date:              input.date,
+    stage: 'cosecha',
+    date: input.date,
     cantidadCosechada: input.cantidadCosechada,
-    descarte:          input.descarte,
+    descarte: input.descarte,
     ...(input.notes !== undefined && { notes: input.notes }),
   };
   await updateDoc(doc(db, 'lotes', id), {
-    stage:        'cosecha',
+    stage: 'cosecha',
     stageHistory: arrayUnion(entry),
   });
 }
@@ -87,6 +88,7 @@ Colección: `lotes/{lotId}` — campo `stageHistory` (arrayUnion).
 ### Configuración
 
 Variable de entorno en `.env.local` (nunca commitear):
+
 ```
 VITE_TELEGRAM_BOT_TOKEN=...
 VITE_TELEGRAM_CHAT_ID=...
@@ -102,14 +104,11 @@ export async function sendTelegramAlert(message: string): Promise<void> {
   const token = import.meta.env.VITE_TELEGRAM_BOT_TOKEN;
   const chatId = import.meta.env.VITE_TELEGRAM_CHAT_ID;
   if (!token || !chatId) return; // silencioso en dev si no están configuradas
-  await fetch(
-    `https://api.telegram.org/bot${token}/sendMessage`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chat_id: chatId, text: message, parse_mode: 'HTML' }),
-    },
-  );
+  await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ chat_id: chatId, text: message, parse_mode: 'HTML' }),
+  });
 }
 ```
 
@@ -158,11 +157,16 @@ Ejecutar siempre al cierre: `pnpm typecheck && pnpm lint && pnpm test:run`
 
 ---
 
-## Errores comunes
+## Gotchas
 
-| Problema | Causa | Fix |
-|---|---|---|
-| `StageHistoryEntry` no acepta nuevos campos | El tipo no fue actualizado | Agregar `cantidadCosechada?` y `descarte?` a `StageHistoryEntry` en `types.ts` |
-| Telegram silenciado en producción | `VITE_TELEGRAM_*` no está en `.env.local` de Grigor | Documentar en README de setup; el helper no lanza error si las vars faltan |
-| `lotName` undefined en `onSuccess` | El hook no recibe el nombre del lote | Pasarlo como parámetro al hook: `useRegisterHarvest(id, lotName)` |
-| Descarte ≥ cantidad cosechada | Sin validación en el formulario | Validar antes de habilitar el botón submit |
+| Problema                                                 | Causa                                                                         | Fix                                                                                                                   |
+| -------------------------------------------------------- | ----------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `StageHistoryEntry` no acepta nuevos campos              | El tipo no fue actualizado                                                    | Agregar `cantidadCosechada?` y `descarte?` a `StageHistoryEntry` en `types.ts`                                        |
+| Telegram silenciado en producción                        | `VITE_TELEGRAM_*` no está en `.env.local` de Grigor                           | Documentar en README de setup; el helper no lanza error si las vars faltan                                            |
+| `lotName` undefined en `onSuccess`                       | El hook no recibe el nombre del lote                                          | Pasarlo como parámetro al hook: `useRegisterHarvest(id, lotName)`                                                     |
+| Descarte ≥ cantidad cosechada                            | Sin validación en el formulario                                               | Validar antes de habilitar el botón submit                                                                            |
+| `registerHarvest` rebota con `permission-denied`         | Cuenta no tiene claim `cosechador` o `admin`                                  | Auth console → verificar claim; ver `feedback_rbac_claims_preflight`                                                  |
+| Cosecha registrada pero Telegram no llega y no hay error | `fetch` falla silencioso en `lib/telegram.ts` (no rechaza por status 4xx/5xx) | Loggear `response.status` y opcionalmente mostrar toast no-bloqueante "alerta no enviada" — la cosecha SÍ se registró |
+| Cosecha cuenta plantas por encima del stock del lote     | No se descuenta `currentQuantity` al cosechar                                 | El descuento debe ir en la misma transaction Firestore que el `arrayUnion(stageHistory)`                              |
+| Doble-tap en "Registrar" crea dos entries duplicados     | Botón submit no se deshabilita durante la mutation                            | `<button disabled={mutation.isPending}>` y/o `useMutation` con `mutationKey` para deduplicar                          |
+| Test pasa con mock pero registro real corta plantas mal  | Mock no replica la transacción Firestore                                      | Test de integración con emulador (`vitest.security.config.ts`) o e2e con Playwright MCP                               |
