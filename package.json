@@ -12,7 +12,9 @@
     "format": "prettier --write \"src/**/*.{ts,tsx,css,md}\"",
     "test": "vitest",
     "test:run": "vitest run",
-    "test:ui": "vitest --ui"
+    "test:ui": "vitest --ui",
+    "test:rules": "firebase emulators:exec --only firestore \"vitest run --config vitest.security.config.ts\"",
+    "rules:deploy": "firebase deploy --only firestore:rules --project=nalhuitad-d6758"
   },
   "devEngines": {
     "packageManager": {
@@ -31,6 +33,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
+    "@firebase/rules-unit-testing": "^3.0.4",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
@@ -43,6 +46,7 @@
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.2",
+    "firebase-tools": "^13.29.1",
     "globals": "^17.6.0",
     "jsdom": "^25.0.1",
     "prettier": "^3.8.3",

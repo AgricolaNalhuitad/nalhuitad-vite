@@ -2,7 +2,6 @@
   "permissions": {
     "allow": [
       "Bash(npx skills@latest *)",
-      "Bash(pnpm dlx *)",
       "Bash(claude mcp *)",
       "Skill(mempalace:status)",
       "Skill(mempalace:mempalace)",
@@ -23,7 +22,44 @@
       "Bash(pnpm react-doctor *)",
       "Bash(pnpm update *)",
       "Bash(git stash *)",
-      "Bash(pnpm dev *)"
+      "Bash(pnpm dev *)",
+      "PowerShell(.specify/extensions/git/scripts/powershell/auto-commit.ps1 after_specify)",
+      "Bash(git ls-remote *)",
+      "Bash(npx ecc-agentshield *)",
+      "Skill(update-config)",
+      "PowerShell(Test-Path *)",
+      "Skill(book-to-skill)",
+      "PowerShell(python --version 2>&1; python3 --version 2>&1)",
+      "PowerShell(python \"C:\\\\nalhuitad-vite\\\\.agents\\\\skills\\\\book-to-skill\\\\scripts\\\\extract.py\" \"C:\\\\Users\\\\yisus\\\\Downloads\\\\Hydroponic-Food-Production-A-Definitive-Guidebook-for-the-Advanced-Home-Gardener-and-the-Commercial-Hydroponic-Grower-Howard-M.-Resh-Z-Library.pdf\" --mode text --install-missing no 2>&1)",
+      "Bash(grep -n -E \"^\\(Chapter [0-9]+$|Chapter [0-9]+ \\)\" /c/Users/yisus/AppData/Local/Temp/book_skill_work/full_text.txt)",
+      "Bash(grep -n \"^1$\\\\|^1 \\\\|Introduction$\\\\|^Chapter 1\" /c/Users/yisus/AppData/Local/Temp/book_skill_work/full_text.txt)",
+      "Bash(grep -n -E \"^[0-9]+ \\(Introduction|Plant Nutrition|Nutrient Solution|The Medium|Water Culture|Nutrient Film Technique|Gravel Culture|Sand Culture|Sawdust Culture|Rockwool Culture|Coco Coir Culture|Other Soilless Cultures|Tropical Hydroponics|Plant Culture\\)$\" /c/Users/yisus/AppData/Local/Temp/book_skill_work/full_text.txt)",
+      "Bash(awk '!seen[$2]++')",
+      "Bash(Get-ChildItem *)",
+      "Bash(pnpm list *)",
+      "PowerShell(python \"C:\\\\nalhuitad-vite\\\\.agents\\\\skills\\\\book-to-skill\\\\scripts\\\\extract.py\" \"C:\\\\Users\\\\yisus\\\\Downloads\\\\65060_Plant-Nutrition-of-Greenhouse-Crops-Springer-Netherlands-2009-ucebnice.pdf\" --mode text --install-missing no 2>&1)",
+      "Bash(grep -n -E \"^[0-9]+ \\(Greenhouse Horticulture|Fertilizers and Soil|Soil Solution|Soil and Substrate Testing|Tissue Tests|Water Uptake|Salinity and Water|Crop Response|Calcium Nutrition|Chemical Effects|Substrates:|Nutrient Solutions for|Nutrient Management in|Fertigation Management|Fertigation in Soil|Nutrient Management of|Plant Nutrition in Future\\)$\" \"/c/Users/yisus/AppData/Local/Temp/book_skill_work/full_text.txt\")",
+      "Bash(awk '!seen[$2\" \"$3]++')",
+      "Bash(grep -n \"^References$\" \"/c/Users/yisus/AppData/Local/Temp/book_skill_work/full_text.txt\")",
+      "Bash(dir *)",
+      "Bash(pnpm install *)",
+      "Bash(pnpm exec *)",
+      "Bash(java *)",
+      "Bash(pnpm test:rules *)",
+      "Bash(pnpm rules:deploy *)",
+      "Bash(git -C C:/nalhuitad-vite worktree list)",
+      "Bash(git -C C:/nalhuitad-vite branch -a)",
+      "Bash(npx --yes firecrawl-mcp --version)",
+      "Read(//c/Users/yisus/.claude/**)",
+      "Read(//c/Users/yisus/.claude/skills/**)",
+      "Bash(powershell -NoProfile -Command \"Get-Content C:/nalhuitad-vite/.claude/hooks/format-on-stop.ps1 | Out-Null; if \\($?\\) { 'PS script parses OK' } else { 'PS script syntax error' }\")",
+      "Bash(powershell *)",
+      "Bash(git reset *)"
+    ],
+    "ask": [
+      "Bash(pnpm dlx *)",
+      "PowerShell(pnpm dlx *)",
+      "Bash(git clone *)"
     ]
   }
 }

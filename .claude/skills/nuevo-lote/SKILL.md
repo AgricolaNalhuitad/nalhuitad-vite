@@ -30,13 +30,13 @@ Workflow completo para crear un lote nuevo en nalhuitad. Cubre el formulario, la
 
 ## Invariantes del dominio (NO ignorar)
 
-| Invariante | Valor | Archivo |
-|---|---|---|
-| Stage inicial | siempre `'almacigo'` | `lotApi.ts` `createLot` |
-| Plantas por bandeja | `135` | `lotApi.ts`: `currentQuantity = quantity * 135` |
-| Variedad default | `'Milena'` | `CreateLotScreen` estado inicial |
-| Fecha default | hoy (`new Date().toISOString().slice(0, 10)`) | `CreateLotScreen` estado inicial |
-| Invernaderos válidos | `'A'` o `'B'` | tipo `'A' \| 'B'` en el select |
+| Invariante           | Valor                                         | Archivo                                         |
+| -------------------- | --------------------------------------------- | ----------------------------------------------- |
+| Stage inicial        | siempre `'almacigo'`                          | `lotApi.ts` `createLot`                         |
+| Plantas por bandeja  | `135`                                         | `lotApi.ts`: `currentQuantity = quantity * 135` |
+| Variedad default     | `'Milena'`                                    | `CreateLotScreen` estado inicial                |
+| Fecha default        | hoy (`new Date().toISOString().slice(0, 10)`) | `CreateLotScreen` estado inicial                |
+| Invernaderos válidos | `'A'` o `'B'`                                 | tipo `'A' \| 'B'` en el select                  |
 
 > **Nunca** dejar `variety` vacío como default — usar `'Milena'`.  
 > **Nunca** cambiar la fórmula `quantity * 135` sin actualizar los tests de `lotApi.test.ts`.
@@ -68,8 +68,8 @@ Colección: `lotes` — `addDoc(collection(db, 'lotes'), { ... })`
 
 ```ts
 interface Location {
-  invernadero: string;   // 'A' | 'B'
-  tipo: string;          // 'piscina' | 'tubo' | 'canal'
+  invernadero: string; // 'A' | 'B'
+  tipo: string; // 'piscina' | 'tubo' | 'canal'
   identificador: string; // e.g. 'P01', 'T03'
 }
 ```
@@ -83,8 +83,8 @@ Invernaderos disponibles para almácigo inicial: **A** (DWC raíz flotante) y **
 
 ```tsx
 // Estado inicial canónico para CreateLotScreen
-const [variety, setVariety] = useState('Milena');           // default dominio
-const [date, setDate] = useState(today);                    // default hoy
+const [variety, setVariety] = useState('Milena'); // default dominio
+const [date, setDate] = useState(today); // default hoy
 const [invernadero, setInvernadero] = useState<'A' | 'B'>('A');
 const [tipo, setTipo] = useState('piscina');
 ```
@@ -104,16 +104,16 @@ navigate('/lotes');
 // lotApi.ts
 export async function createLot(input: NewLotInput): Promise<string> {
   const ref = await addDoc(collection(db, 'lotes'), {
-    name:            input.name,
-    variety:         input.variety,
-    date:            input.date,
-    quantity:        input.quantity,
-    currentQuantity: input.quantity * 135,   // invariante: 135 plantas/bandeja
-    stage:           'almacigo',              // invariante: siempre almacigo
-    location:        input.location,
-    stageHistory:    [{ stage: 'almacigo', date: input.date }],
-    raleos:          [],
-    childrenIds:     [],
+    name: input.name,
+    variety: input.variety,
+    date: input.date,
+    quantity: input.quantity,
+    currentQuantity: input.quantity * 135, // invariante: 135 plantas/bandeja
+    stage: 'almacigo', // invariante: siempre almacigo
+    location: input.location,
+    stageHistory: [{ stage: 'almacigo', date: input.date }],
+    raleos: [],
+    childrenIds: [],
   });
   return ref.id;
 }
@@ -142,12 +142,17 @@ Siempre al cierre: `pnpm typecheck && pnpm lint && pnpm test:run`
 
 ---
 
-## Errores comunes
+## Gotchas
 
-| Problema | Causa | Fix |
-|---|---|---|
-| `variety` llega vacío a Firestore | `useState('')` en vez de `useState('Milena')` | Cambiar el estado inicial |
-| `currentQuantity` incorrecto | Cambiar `quantity` sin actualizar la fórmula `× 135` | Buscar todos los usos en `lotApi.ts` y tests |
-| Lote creado con stage incorrecto | Pasar `stage` como input variable | `stage` está hardcodeado en `createLot` — no es input |
-| Select invernadero acepta 'C' o 'D' | Tipo demasiado permisivo | Usar `'A' \| 'B'` explícito |
-| `identificador` vacío pasa validación | Sin `required` en el input | Agregar `required` al campo identificador |
+| Problema                                               | Causa                                                                               | Fix                                                                                                      |
+| ------------------------------------------------------ | ----------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `variety` llega vacío a Firestore                      | `useState('')` en vez de `useState('Milena')`                                       | Cambiar el estado inicial                                                                                |
+| `currentQuantity` incorrecto                           | Cambiar `quantity` sin actualizar la fórmula `× 135`                                | Buscar todos los usos en `lotApi.ts` y tests                                                             |
+| Lote creado con stage incorrecto                       | Pasar `stage` como input variable                                                   | `stage` está hardcodeado en `createLot` — no es input                                                    |
+| Select invernadero acepta 'C' o 'D'                    | Tipo demasiado permisivo                                                            | Usar `'A' \| 'B'` explícito                                                                              |
+| `identificador` vacío pasa validación                  | Sin `required` en el input                                                          | Agregar `required` al campo identificador                                                                |
+| `createLot` rebota con `permission-denied` silencioso  | Cuenta no tiene custom claim `cosechador` o `admin` requerido por `firestore.rules` | Verificar en Auth console que la cuenta del usuario tiene el claim; ver `feedback_rbac_claims_preflight` |
+| Navegar a `/mas/nuevo` no funciona                     | Ruta histórica incorrecta                                                           | La ruta canónica es `/lotes/nuevo` — error registrado en CLAUDE_vite.md §"Errores conocidos #4"          |
+| Lote hijo con cuenta de plantas duplicada              | Usar `toPlants(lot.quantity)` en lote con `parentId`                                | Usar `lotPlantasIniciales(lot)` — verifica `parentId` y descuenta del padre                              |
+| Tests pasan local pero fallan en `pnpm test:rules`     | Tests unitarios usan mock; rules tests usan emulador Firestore                      | Correr ambos antes de cerrar: `pnpm test:run && pnpm test:rules`                                         |
+| Hooks después de un `return` condicional al crear lote | Pantalla con early-return + `useEffect`/`useState` después                          | React error #310 — todos los hooks ANTES de cualquier return                                             |

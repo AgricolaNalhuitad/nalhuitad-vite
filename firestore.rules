@@ -1,0 +1,20 @@
+rules_version = '2';
+
+// ============================================================
+// ROLLBACK TEMPORAL — 2026-05-24
+// Incidente: rules de commit e6d4aee causaban logout en producción
+// al crear lote. Diagnóstico en curso (probable: falta custom claim
+// 'role' en cuenta de Grigor → isOperator() retorna false → denied).
+//
+// Estas reglas restauran el estado previo (auth-only, sin RBAC) hasta
+// que (1) se asigne el claim 'role: owner' al UID de Grigor vía
+// Admin SDK, y (2) se valide nuevamente con la app en vivo.
+// ============================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}

@@ -1,0 +1,3 @@
+[allowlist]
+  description = "Allowlist de falsos positivos"
+  regexes = ["nalhuitad-d6758"]
