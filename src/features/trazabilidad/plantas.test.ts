@@ -4,21 +4,8 @@ import {
   LECHUGAS_POR_PAQUETE,
   bandejasALechugas,
   paquetesALechugas,
-  calcularCurrentQuantity,
   validarSumaRaleo,
 } from './plantas';
-import type { EventoHistorial } from './types';
-
-function evento(partial: Partial<EventoHistorial>): EventoHistorial {
-  return {
-    id: 'e',
-    upId: 'u1',
-    loteOrigenId: 'l1',
-    fecha: '2026-05-01',
-    tipoAccion: 'descarte',
-    ...partial,
-  };
-}
 
 describe('plantas', () => {
   describe('bandejasALechugas', () => {
@@ -32,21 +19,6 @@ describe('plantas', () => {
     it('multiplica paquetes por 2 (FR-015)', () => {
       expect(LECHUGAS_POR_PAQUETE).toBe(2);
       expect(paquetesALechugas(100)).toBe(200);
-    });
-  });
-
-  describe('calcularCurrentQuantity', () => {
-    it('resta la suma de descartes a la cantidad inicial (FR-031)', () => {
-      const eventos = [
-        evento({ id: 'e1', cantidadDescartada: 10 }),
-        evento({ id: 'e2', cantidadDescartada: 5 }),
-      ];
-      expect(calcularCurrentQuantity(210, eventos)).toBe(195);
-    });
-
-    it('devuelve la cantidad inicial cuando no hay descartes', () => {
-      const eventos = [evento({ id: 'e1', tipoAccion: 'creacion', cantidadDescartada: undefined })];
-      expect(calcularCurrentQuantity(540, eventos)).toBe(540);
     });
   });
 

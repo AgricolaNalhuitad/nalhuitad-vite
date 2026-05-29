@@ -5,7 +5,7 @@ function serie(
   tipo: Ubicacion['tipo'],
   prefijo: string,
   count: number,
-  capacidadMax: number,
+  capacidadMaxima: number,
   funcion: string,
 ): Ubicacion[] {
   return Array.from({ length: count }, (_, i) => {
@@ -15,7 +15,7 @@ function serie(
       invernadero,
       tipo,
       identificador,
-      capacidadMax,
+      capacidadMaxima,
       funcion,
     };
   });
@@ -31,7 +31,7 @@ export const UBICACIONES_SEED: readonly Ubicacion[] = [
     invernadero: 'D',
     tipo: 'almacigo',
     identificador: 'ALM',
-    capacidadMax: 810,
+    capacidadMaxima: 810,
     funcion: 'Germinación de almácigos',
   },
   ...serie('C', 'piscina_intermedia', 'P', 4, 540, 'Aclimatación y trasplante'),

@@ -23,7 +23,7 @@ describe('UBICACIONES_SEED', () => {
   });
 
   it('respeta las capacidades máximas del dominio', () => {
-    const cap = (id: string) => UBICACIONES_SEED.find((u) => u.id === id)?.capacidadMax;
+    const cap = (id: string) => UBICACIONES_SEED.find((u) => u.id === id)?.capacidadMaxima;
     expect(cap('INV-A-P05')).toBe(252);
     expect(cap('INV-B-B02')).toBe(290);
     expect(cap('INV-C-P01')).toBe(540);

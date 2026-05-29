@@ -1,36 +1,71 @@
-// Modelo LO+UP (Sprint 4). Ver specs/001-traceability-lo-up/data-model.md.
-// Stage se redefine aquí (en vez de importar de ../lotes) porque el módulo lotes
-// queda como Histórico solo-lectura; trazabilidad es la fuente de verdad nueva.
+// Modelo LO+UP (Sprint 4).
+// Fuente de verdad: firestore.rules + tests/security/firestore.rules.test.ts (60 tests).
+// Reconciliado 2026-05-29 al test suite committeado.
 
 export type Stage = 'almacigo' | 'transplante' | 'raleo' | 'cosecha';
 
 export type LoteOrigenEstado = 'activo' | 'cosechado' | 'descartado';
 export type UnidadEstado = 'activa' | 'cosechada' | 'descartada' | 'trasladada';
-export type EventoTipo = 'creacion' | 'traslado' | 'raleo' | 'cosecha' | 'descarte';
+export type HistorialTipo = 'creacion' | 'traslado' | 'raleo' | 'cosecha' | 'descarte';
 export type UbicacionTipo = 'almacigo' | 'piscina_intermedia' | 'piscina_dwc' | 'bancada_nft';
 export type Invernadero = 'A' | 'B' | 'C' | 'D';
 
-/** Identidad genealógica de una siembra. Persiste hasta que todas sus UP están cosechadas. */
-export interface LoteOrigen {
+/** Campos de auditoría comunes (timestamps como ISO string). */
+export interface AuditFields {
+  createdAt: string;
+  createdBy: string;
+  lastModifiedBy?: string;
+  lastModifiedAt?: string;
+}
+
+/** Identidad genealógica de una siembra. Colección `loteOrigen`. */
+export interface LoteOrigen extends AuditFields {
   id: string;
-  variety: string;
-  fechaSiembra: string;   // ISO YYYY-MM-DD
+  nombre: string;          // nombre amigable, ej. "Milena 23-May"
+  variedad: string;
+  fechaSiembra: string;    // ISO YYYY-MM-DD
   bandejas: number;
-  nombreAmigable: string;
+  cantidadInicial: number; // = bandejas * 135
   estado: LoteOrigenEstado;
   notas?: string;
 }
 
-/** Presencia física de plantas en una ubicación concreta. */
-export interface UnidadProduccion {
+/** Entrada embebida del historial de una UP (no es colección — D2). */
+export interface HistorialEntry {
+  fecha: string;           // ISO YYYY-MM-DD
+  tipoAccion: HistorialTipo;
+  cantidad?: number;
+  cantidadDescartada?: number;
+  ubicacionPrevia?: string;
+  ubicacionNueva?: string;
+  notas?: string;
+}
+
+/** Presencia física de plantas en una ubicación. Colección `unidadesProduccion`. */
+export interface UnidadProduccion extends AuditFields {
   id: string;
-  loteOrigenId: string;
-  parentUpId?: string;    // si nació de un raleo
+  refLoteOrigen: string;
+  parentUpId?: string;        // si nació de un raleo
   ubicacionId: string;
-  cantidadInicial: number;
+  cantidad: number;           // persistida y mutable (baja en cosecha/raleo — D4b)
   etapa: Stage;
   estado: UnidadEstado;
-  fechaIngreso: string;   // ISO YYYY-MM-DD
+  fechaIngreso: string;       // ISO YYYY-MM-DD
+  historial: HistorialEntry[];
+}
+
+/** Registro de cosecha (ledger append-only). Colección `cosechas`. */
+export interface Cosecha {
+  id: string;
+  refUnidadProduccion: string;
+  refLoteOrigen: string;
+  paquetes: number;
+  descarte: number;
+  lechugasEquivalentes: number; // = paquetes * 2
+  fecha: string;                // ISO YYYY-MM-DD
+  notas?: string;
+  createdAt: string;
+  createdBy: string;
 }
 
 /** Espacio físico productivo. Catálogo seed de 19 (FR-024). id = INV-X-YYY. */
@@ -39,28 +74,14 @@ export interface Ubicacion {
   invernadero: Invernadero;
   tipo: UbicacionTipo;
   identificador: string;
-  capacidadMax: number;
+  capacidadMaxima: number;
   funcion?: string;
 }
 
-/** Entrada append-only de la bitácora de una UP (FR-032). */
-export interface EventoHistorial {
-  id: string;
-  upId: string;
-  loteOrigenId: string;
-  fecha: string;          // ISO YYYY-MM-DD
-  tipoAccion: EventoTipo;
-  cantidad?: number;
-  cantidadDescartada?: number;
-  ubicacionPrevia?: string;
-  ubicacionNueva?: string;
-  notas?: string;
-}
-
-// --- Inputs ---
+// --- Inputs (capa de app; los campos de audit/derivados los completa la api) ---
 
 export interface NuevaSiembraInput {
-  variety: string;
+  variedad: string;
   fechaSiembra: string;   // ISO YYYY-MM-DD
   bandejas: number;
   notas?: string;
@@ -69,7 +90,6 @@ export interface NuevaSiembraInput {
 export interface TrasladoInput {
   ubicacionDestinoId: string;
   fecha: string;          // ISO YYYY-MM-DD
-  cantidad?: number;
   notas?: string;
 }
 
@@ -85,7 +105,7 @@ export interface RaleoInput {
 }
 
 export interface CosechaInput {
-  paquetes: number;       // UI en paquetes; se persiste en lechugas (×2)
+  paquetes: number;       // UI en paquetes; se persiste lechugasEquivalentes (×2)
   descarte: number;       // lechugas individuales
   fecha: string;          // ISO YYYY-MM-DD
   notas?: string;

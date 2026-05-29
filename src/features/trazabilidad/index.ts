@@ -5,5 +5,3 @@ export * from './nombreAmigable';
 export * from './ubicacionesSeed';
 export * from './ubicacionesApi';
 export * from './useUbicaciones';
-export * from './eventosApi';
-export * from './useEventosPorUp';
