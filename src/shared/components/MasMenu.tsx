@@ -18,6 +18,9 @@ export function MasMenu() {
     <section className={styles.root}>
       <h1 className={styles.title}>Más</h1>
       <nav className={styles.list}>
+        <Link to="/trazabilidad" className={styles.item}>
+          Trazabilidad
+        </Link>
         {ITEMS.map((item) => (
           <Link key={item.slug} to={`/mas/${item.slug}`} className={styles.item}>
             {item.label}
