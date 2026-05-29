@@ -20,3 +20,4 @@ export { QrPrintScreen } from './screens/QrPrintScreen';
 export { UpDetailScreen } from './screens/UpDetailScreen';
 export { TrasladarUpScreen } from './screens/TrasladarUpScreen';
 export { RalearUpScreen } from './screens/RalearUpScreen';
+export { CosecharUpScreen } from './screens/CosecharUpScreen';

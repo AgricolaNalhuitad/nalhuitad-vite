@@ -122,15 +122,15 @@ Vite SPA single-project, feature-organized. Módulo nuevo `src/features/trazabil
 
 ### Tests for User Story 4 ⚠️
 
-- [ ] T038 [P] [US4] Integration test en `src/features/trazabilidad/unidadesApi.test.ts`: `registrarCosecha` parcial→activa / total→cosechada; bloquea exceso (INV-4); auto-cierre LO cuando todas las UP cosechadas (FR-019)
-- [ ] T039 [P] [US4] Component test `src/features/trazabilidad/screens/CosecharUpScreen.test.tsx` (UI en paquetes, persiste lechugas)
+- [X] T038 [P] [US4] Integration test en `src/features/trazabilidad/unidadesApi.integration.test.ts`: `registrarCosecha` parcial→activa / total→cosechada; bloquea exceso (INV-4); auto-cierre LO cuando todas las UP cosechadas (FR-019) — 3/3 verde
+- [X] T039 [P] [US4] Component test `src/features/trazabilidad/screens/CosecharUpScreen.test.tsx` (UI en paquetes, persiste lechugas) — 2/2 verde (×2 + bloqueo INV-4)
 
 ### Implementation for User Story 4
 
-- [ ] T040 [US4] Añadir `registrarCosecha` a `src/features/trazabilidad/unidadesApi.ts` (paquetes×2, parcial/total, auto-cierre LO en writeBatch)
-- [ ] T041 [US4] `useCosechar(upId)` en `useTrazabilidadMutations.ts`
-- [ ] T042 [US4] `src/features/trazabilidad/screens/CosecharUpScreen.tsx` (input paquetes + descarte, validación INV-4) + ruta `/up/:upId/cosechar`
-- [ ] T043 [US4] E2E `e2e/flujos/cosecha-autocierre.spec.ts`: cosecha total → UP cosechada + LO auto-cerrado + guardrail (cosecha excede bloquea)
+- [X] T040 [US4] Añadir `registrarCosecha` a `src/features/trazabilidad/unidadesApi.ts` (paquetes×2, parcial/total, INV-4, auto-cierre LO en writeBatch; ledger en `cosechas`)
+- [X] T041 [US4] `useCosechar(upId)` en `useTrazabilidadMutations.ts` (invalida UP + lote por auto-cierre)
+- [X] T042 [US4] `src/features/trazabilidad/screens/CosecharUpScreen.tsx` (input paquetes + descarte, preview lechugas, validación INV-4) + ruta `/up/:upId/cosechar`. Acción "Cosechar" en UpDetailScreen
+- [X] T043 [US4] E2E `e2e/flujos/cosecha-autocierre.spec.ts`: cosecha total → UP cosechada + LO auto-cerrado (desaparece del listado) + guardrail (exceso bloquea) — 1 passed
 
 **Checkpoint**: US1-US4 funcionan independientemente.
 

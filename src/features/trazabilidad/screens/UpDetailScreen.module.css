@@ -73,13 +73,14 @@
 
 .actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
   margin-bottom: 20px;
 }
 
 .action,
 .actionSecondary {
-  flex: 1;
+  flex: 1 1 45%;
   text-align: center;
   padding: 11px;
   border-radius: 10px;

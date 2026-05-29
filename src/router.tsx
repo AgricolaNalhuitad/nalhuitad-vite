@@ -16,6 +16,7 @@ import {
   UpDetailScreen,
   TrasladarUpScreen,
   RalearUpScreen,
+  CosecharUpScreen,
 } from '@/features/trazabilidad';
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -77,6 +78,14 @@ export const appRouter = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <RalearUpScreen />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/up/:upId/cosechar',
+    element: (
+      <ProtectedRoute>
+        <CosecharUpScreen />
       </ProtectedRoute>
     ),
   },
