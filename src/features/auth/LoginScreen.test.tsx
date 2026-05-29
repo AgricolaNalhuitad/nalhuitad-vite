@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { MemoryRouter } from 'react-router-dom';
@@ -79,6 +79,8 @@ describe('LoginScreen', () => {
     await user.type(screen.getByLabelText(/contraseña/i), 'pw');
     await user.click(screen.getByRole('button', { name: /entrar/i }));
     expect(screen.getByRole('button', { name: /entrando/i })).toBeDisabled();
-    resolve({ user: { uid: 'u1' } });
+    await act(async () => {
+      resolve({ user: { uid: 'u1' } });
+    });
   });
 });
