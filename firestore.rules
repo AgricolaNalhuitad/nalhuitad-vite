@@ -5,10 +5,18 @@ rules_version = '2';
 //
 // ⚠️ DEPLOY GATING — incidente e6d4aee (2026-05-24):
 // Estas reglas exigen el custom claim `role` (owner|operator) en las cuentas.
+//
+// PREFLIGHT (T055):
+//   - Script idempotente: scripts/set-custom-claims.ts (Admin SDK).
+//   - 2026-05-29: VERIFICADO en Auth Emulator — claim `owner` aplicado e idempotente;
+//     `pnpm test:rules` 60/60 confirma isOwner()/isOperator() con el claim presente.
+//   - UIDs reales de PROD: NO confirmados aún en este repo (no se tocó prod Auth).
+//     Obtener el UID de Grigor en Firebase Console → Authentication → Users.
+//
 // ANTES de `firebase deploy --only firestore:rules` / `pnpm rules:deploy`:
-//   1. Asignar `role: 'owner'` al UID de Grigor (y `operator` a los trabajadores)
-//      vía Admin SDK — preflight de claims sobre cuentas EXISTENTES.
-//   2. Validar en vivo (crear lote) que no hay permission-denied silencioso.
+//   1. (PROD, con service-account.json en la raíz)
+//        pnpm tsx scripts/set-custom-claims.ts --owner <uid-grigor> [--operator <uid-socio>]
+//   2. Validar en vivo (crear lote) que NO hay permission-denied silencioso.
 // Deployar sin el preflight reproduce el logout en producción.
 // Revisar con `gstack /code-review --ultra` antes de deploy.
 // ============================================================

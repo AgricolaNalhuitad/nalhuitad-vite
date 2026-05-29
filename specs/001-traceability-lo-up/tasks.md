@@ -175,6 +175,8 @@ Vite SPA single-project, feature-organized. Módulo nuevo `src/features/trazabil
 - [ ] T053 [P] Limpiar campos vestigiales en el modelo legacy si quedan sin uso (no romper Histórico) — anotar como follow-up si es fuera de scope
 - [ ] T054 Ejecutar validación de quickstart.md (incluye pasos del switchover manual) y dejar evidencia
 - [ ] T055 **Seguridad (zona crítica):** correr `gstack /code-review --ultra` sobre reglas Firestore + RBAC y `pnpm test:rules` verde ANTES de abrir PR; preflight de custom claims en cuentas existentes antes de `pnpm rules:deploy`
+  - [X] Preflight script `scripts/set-custom-claims.ts` (idempotente) creado + **verificado en Auth Emulator** (2026-05-29); `pnpm test:rules` 60/60; header de `firestore.rules` documentado
+  - [ ] PENDIENTE prod: asignar UID real de Grigor (Console → Auth) con service-account.json + validar createLot en vivo + `gstack /code-review --ultra` + deploy
 - [ ] T056 [P] ADR en `docs/adr/` documentando el corte limpio legacy (por qué FR-027…030 se descopearon)
 
 ---
