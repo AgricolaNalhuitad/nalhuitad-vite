@@ -12,11 +12,12 @@ import { defineConfig, devices } from '@playwright/test';
  * apuntaría a Firestore de producción. El projectId `demo-*` es una segunda barrera:
  * el emulador trata los proyectos `demo-` como locales y sin credenciales.
  */
-const PORT = 5173;
+const PORT = 5273; // puerto dedicado a E2E (no colisiona con `pnpm dev` en 5173)
 const BASE_URL = `http://127.0.0.1:${PORT}`;
 
 export default defineConfig({
   testDir: './flujos',
+  globalSetup: './fixtures/seed.ts',
   fullyParallel: true,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 2 : 0,
@@ -33,9 +34,11 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'pnpm dev',
+    command: 'pnpm dev --port 5273 --host 127.0.0.1',
     url: BASE_URL,
-    reuseExistingServer: !process.env.CI,
+    // Nunca reusar un server existente: garantiza que el server E2E corre con
+    // VITE_USE_EMULATOR (apuntando al emulador), no un `pnpm dev` contra prod.
+    reuseExistingServer: false,
     timeout: 120_000,
     env: {
       VITE_USE_EMULATOR: 'true',

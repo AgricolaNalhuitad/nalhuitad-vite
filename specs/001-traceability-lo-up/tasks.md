@@ -65,7 +65,7 @@ Vite SPA single-project, feature-organized. Módulo nuevo `src/features/trazabil
 - [X] T020 [P] [US1] Componentes QR en `src/features/trazabilidad/qr/QrCode.tsx` (wrap qrcode.react) y `qr/PrintableQr.tsx` (QR + nombre + variedad + fecha, `@media print`) — FR-020 · test colocado verde
 - [X] T021 [US1] `src/features/trazabilidad/screens/CrearSiembraScreen.tsx` + `screens/TrazabilidadListScreen.tsx` (listado lotes activos) + `screens/QrPrintScreen.tsx` (/up/:upId/qr) hasta que T015 pase. Añadidos `unidadesApi.subscribeUnidades` + `useUnidades` (mínimo, lo extiende US2) para join lote↔UP en el listado
 - [X] T022 [US1] Registrar rutas `/trazabilidad`, `/trazabilidad/siembra` (dentro de AppShell) y `/up/:upId/qr` (página enfocada, fuera de AppShell para impresión) en `src/router.tsx`
-- [ ] T023 [US1] E2E `e2e/flujos/siembra-qr.spec.ts` + fixture `e2e/fixtures/seed.ts`: siembra → aparece en listado → QR imprimible visible
+- [X] T023 [US1] E2E `e2e/flujos/siembra-qr.spec.ts` + fixture `e2e/fixtures/seed.ts`: siembra → aparece en listado → QR imprimible visible — **1 passed** sobre emulador (login owner sembrado → siembra → QR → listado). Approach A: `src/lib/firebase.ts` conecta emuladores gateado por `VITE_USE_EMULATOR` (prod intacto; revisar con code-review --ultra antes de PR)
 
 **Checkpoint**: US1 funcional y testeable de forma independiente — **MVP demoable**.
 

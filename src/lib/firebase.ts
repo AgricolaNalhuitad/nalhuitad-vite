@@ -1,6 +1,7 @@
 import { initializeApp, type FirebaseApp } from 'firebase/app';
-import { getAuth, type Auth } from 'firebase/auth';
+import { connectAuthEmulator, getAuth, type Auth } from 'firebase/auth';
 import {
+  connectFirestoreEmulator,
   initializeFirestore,
   persistentLocalCache,
   persistentMultipleTabManager,
@@ -51,3 +52,11 @@ export const db: Firestore = initializeFirestore(app, {
     tabManager: persistentMultipleTabManager(),
   }),
 });
+
+// Solo dev/E2E: conecta a los emuladores cuando VITE_USE_EMULATOR === 'true'.
+// En el build de producción esa variable nunca se define, así que este bloque no corre
+// y la app habla con Firebase real. Cambio en zona crítica → revisar con code-review --ultra.
+if (import.meta.env.VITE_USE_EMULATOR === 'true') {
+  connectAuthEmulator(auth, 'http://127.0.0.1:9099', { disableWarnings: true });
+  connectFirestoreEmulator(db, '127.0.0.1', 8080);
+}
