@@ -54,7 +54,7 @@ Vite SPA single-project, feature-organized. Módulo nuevo `src/features/trazabil
 
 - [X] T013 [P] [US1] Unit test `src/features/trazabilidad/nombreAmigable.test.ts` (genera "Milena 23-May"; sufijo "#02" en colisión mismo día — FR-003)
 - [X] T014 [P] [US1] Integration test `src/features/trazabilidad/lotesOrigenApi.integration.test.ts` sobre emulador: `createSiembra` crea LO + UP inicial (Inv D, cantidad = bandejas×135) atómicamente (FR-002, FR-004) — 3/3 verde; harness `vitest.integration.config.ts` + `pnpm test:integration`
-- [ ] T015 [P] [US1] Component test `src/features/trazabilidad/screens/CrearSiembraScreen.test.tsx` (form variedad/bandejas/fecha → confirma)
+- [X] T015 [P] [US1] Component test `src/features/trazabilidad/screens/CrearSiembraScreen.test.tsx` (form variedad/bandejas/fecha → confirma) — 3/3 verde (default Milena, navega a /up/:upId/qr, valida bandejas>0)
 
 ### Implementation for User Story 1
 
@@ -63,8 +63,8 @@ Vite SPA single-project, feature-organized. Módulo nuevo `src/features/trazabil
 - [X] T018 [P] [US1] Hooks `src/features/trazabilidad/useLotesOrigen.ts` y `useLoteOrigen.ts` (patrón RQ+Firestore)
 - [X] T019 [US1] `useCrearSiembra()` en `src/features/trazabilidad/useTrazabilidadMutations.ts` (useMutation + invalidateQueries)
 - [X] T020 [P] [US1] Componentes QR en `src/features/trazabilidad/qr/QrCode.tsx` (wrap qrcode.react) y `qr/PrintableQr.tsx` (QR + nombre + variedad + fecha, `@media print`) — FR-020 · test colocado verde
-- [ ] T021 [US1] `src/features/trazabilidad/screens/CrearSiembraScreen.tsx` + `screens/TrazabilidadListScreen.tsx` (listado lotes activos) hasta que T015 pase
-- [ ] T022 [US1] Registrar rutas `/trazabilidad`, `/trazabilidad/siembra`, `/up/:upId/qr` en el router (src/App.tsx o archivo de rutas)
+- [X] T021 [US1] `src/features/trazabilidad/screens/CrearSiembraScreen.tsx` + `screens/TrazabilidadListScreen.tsx` (listado lotes activos) + `screens/QrPrintScreen.tsx` (/up/:upId/qr) hasta que T015 pase. Añadidos `unidadesApi.subscribeUnidades` + `useUnidades` (mínimo, lo extiende US2) para join lote↔UP en el listado
+- [X] T022 [US1] Registrar rutas `/trazabilidad`, `/trazabilidad/siembra` (dentro de AppShell) y `/up/:upId/qr` (página enfocada, fuera de AppShell para impresión) en `src/router.tsx`
 - [ ] T023 [US1] E2E `e2e/flujos/siembra-qr.spec.ts` + fixture `e2e/fixtures/seed.ts`: siembra → aparece en listado → QR imprimible visible
 
 **Checkpoint**: US1 funcional y testeable de forma independiente — **MVP demoable**.

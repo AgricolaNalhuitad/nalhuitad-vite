@@ -9,6 +9,11 @@ import { LotesScreen } from '@/features/lotes/LotesScreen';
 import { LotDetailScreen } from '@/features/lotes/LotDetailScreen';
 import { CreateLotScreen } from '@/features/lotes/CreateLotScreen';
 import { EditLotScreen } from '@/features/lotes/EditLotScreen';
+import {
+  CrearSiembraScreen,
+  TrazabilidadListScreen,
+  QrPrintScreen,
+} from '@/features/trazabilidad';
 
 // eslint-disable-next-line react-refresh/only-export-components
 function MasSubScreen() {
@@ -39,12 +44,22 @@ export const appRouter = createBrowserRouter([
       { path: 'lotes/nuevo',      element: <CreateLotScreen /> },
       { path: 'lotes/:id',        element: <LotDetailScreen /> },
       { path: 'lotes/:id/editar', element: <EditLotScreen /> },
+      { path: 'trazabilidad',         element: <TrazabilidadListScreen /> },
+      { path: 'trazabilidad/siembra', element: <CrearSiembraScreen /> },
       { path: 'dashboard',  element: <PlaceholderScreen name="Dashboard" /> },
       { path: 'alertas',    element: <PlaceholderScreen name="Alertas" /> },
       { path: 'produccion', element: <PlaceholderScreen name="Producción" /> },
       { path: 'mas',        element: <MasMenu /> },
       { path: 'mas/:screen', element: <MasSubScreen /> },
     ],
+  },
+  {
+    path: '/up/:upId/qr',
+    element: (
+      <ProtectedRoute>
+        <QrPrintScreen />
+      </ProtectedRoute>
+    ),
   },
   {
     path: '*',
