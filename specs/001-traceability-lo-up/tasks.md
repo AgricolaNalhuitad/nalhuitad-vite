@@ -22,7 +22,7 @@ Vite SPA single-project, feature-organized. Módulo nuevo `src/features/trazabil
 **Purpose**: Dependencias y estructura base.
 
 - [ ] T001 Añadir dependencias del feature: `pnpm add qrcode.react html5-qrcode` y `pnpm add -D @playwright/test`; luego `pnpm exec playwright install chromium`
-- [ ] T002 [P] Crear estructura del módulo `src/features/trazabilidad/` (subcarpetas `qr/`, `screens/`) + `src/features/trazabilidad/index.ts` con barrel exports
+- [X] T002 [P] Crear estructura del módulo `src/features/trazabilidad/` (subcarpetas `qr/`, `screens/`) + `src/features/trazabilidad/index.ts` con barrel exports
 - [ ] T003 [P] Crear `e2e/playwright.config.ts` apuntando a la app servida sobre el emulador (baseURL, projects chromium)
 - [ ] T004 [P] Añadir script `"test:e2e": "firebase emulators:exec --only firestore,auth \"pnpm exec playwright test\""` a `package.json`
 
@@ -32,9 +32,9 @@ Vite SPA single-project, feature-organized. Módulo nuevo `src/features/trazabil
 
 **⚠️ CRITICAL**: Ninguna user story puede empezar hasta completar esta fase.
 
-- [ ] T005 Definir tipos del modelo LO+UP en `src/features/trazabilidad/types.ts` (LoteOrigen, UnidadProduccion, Ubicacion, EventoHistorial + inputs NuevaSiembraInput/TrasladoInput/RaleoInput/CosechaInput) según data-model.md
-- [ ] T006 [P] Tests de helpers puros en `src/features/trazabilidad/plantas.test.ts` (calcularCurrentQuantity FR-031, paquetesALechugas ×2, validarSumaRaleo INV-1) — deben FALLAR primero
-- [ ] T007 [P] Implementar helpers en `src/features/trazabilidad/plantas.ts` (135/bandeja, 2/paquete, currentQuantity derivada, validación suma) hasta que T006 pase
+- [X] T005 Definir tipos del modelo LO+UP en `src/features/trazabilidad/types.ts` (LoteOrigen, UnidadProduccion, Ubicacion, EventoHistorial + inputs NuevaSiembraInput/TrasladoInput/RaleoInput/CosechaInput) según data-model.md
+- [X] T006 [P] Tests de helpers puros en `src/features/trazabilidad/plantas.test.ts` (calcularCurrentQuantity FR-031, paquetesALechugas ×2, validarSumaRaleo INV-1) — deben FALLAR primero
+- [X] T007 [P] Implementar helpers en `src/features/trazabilidad/plantas.ts` (135/bandeja, 2/paquete, currentQuantity derivada, validación suma) hasta que T006 pase
 - [ ] T008 [P] `src/features/trazabilidad/ubicacionesApi.ts` (`subscribeUbicaciones`) + `useUbicaciones.ts` (patrón RQ+Firestore como `useLotes.ts`)
 - [ ] T009 [P] `src/features/trazabilidad/eventosApi.ts` (`subscribeEventosPorUp`) + `useEventosPorUp.ts`
 - [ ] T010 Crear `scripts/seed-ubicaciones.ts` (tsx + firebase-admin) que pre-siembra las 19 ubicaciones idempotentemente (doc id `INV-X-YYY`) según seed data del spec
@@ -52,13 +52,13 @@ Vite SPA single-project, feature-organized. Módulo nuevo `src/features/trazabil
 
 ### Tests for User Story 1 ⚠️ (escribir y ver fallar primero)
 
-- [ ] T013 [P] [US1] Unit test `src/features/trazabilidad/nombreAmigable.test.ts` (genera "Milena 23-May"; sufijo "#02" en colisión mismo día — FR-003)
+- [X] T013 [P] [US1] Unit test `src/features/trazabilidad/nombreAmigable.test.ts` (genera "Milena 23-May"; sufijo "#02" en colisión mismo día — FR-003)
 - [ ] T014 [P] [US1] Integration test `src/features/trazabilidad/lotesOrigenApi.test.ts` sobre emulador: `createSiembra` crea LO + UP inicial (Inv D, cantidad = bandejas×135) atómicamente (FR-002, FR-004)
 - [ ] T015 [P] [US1] Component test `src/features/trazabilidad/screens/CrearSiembraScreen.test.tsx` (form variedad/bandejas/fecha → confirma)
 
 ### Implementation for User Story 1
 
-- [ ] T016 [P] [US1] Implementar `src/features/trazabilidad/nombreAmigable.ts` (generación + sufijo colisión) hasta que T013 pase
+- [X] T016 [P] [US1] Implementar `src/features/trazabilidad/nombreAmigable.ts` (generación + sufijo colisión) hasta que T013 pase
 - [ ] T017 [US1] `src/features/trazabilidad/lotesOrigenApi.ts` (`subscribeLotesOrigen`, `subscribeLoteOrigen`, `createSiembra` con writeBatch LO+UP+evento 'creacion') — depende de T005, T016
 - [ ] T018 [P] [US1] Hooks `src/features/trazabilidad/useLotesOrigen.ts` y `useLoteOrigen.ts` (patrón RQ+Firestore)
 - [ ] T019 [US1] `useCrearSiembra()` en `src/features/trazabilidad/useTrazabilidadMutations.ts` (useMutation + invalidateQueries)
