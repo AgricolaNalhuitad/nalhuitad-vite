@@ -13,6 +13,8 @@ import {
   CrearSiembraScreen,
   TrazabilidadListScreen,
   QrPrintScreen,
+  UpDetailScreen,
+  TrasladarUpScreen,
 } from '@/features/trazabilidad';
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -52,6 +54,22 @@ export const appRouter = createBrowserRouter([
       { path: 'mas',        element: <MasMenu /> },
       { path: 'mas/:screen', element: <MasSubScreen /> },
     ],
+  },
+  {
+    path: '/up/:upId',
+    element: (
+      <ProtectedRoute>
+        <UpDetailScreen />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/up/:upId/trasladar',
+    element: (
+      <ProtectedRoute>
+        <TrasladarUpScreen />
+      </ProtectedRoute>
+    ),
   },
   {
     path: '/up/:upId/qr',

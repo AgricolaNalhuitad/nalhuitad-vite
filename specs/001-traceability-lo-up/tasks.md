@@ -78,16 +78,16 @@ Vite SPA single-project, feature-organized. Módulo nuevo `src/features/trazabil
 
 ### Tests for User Story 2 ⚠️
 
-- [ ] T024 [P] [US2] Integration test `src/features/trazabilidad/unidadesApi.test.ts` (emulador): `trasladarUnidad` cambia ubicacionId, escribe evento 'traslado', bloquea destino ocupado (FR-005..007, INV-3)
-- [ ] T025 [P] [US2] Component test `src/features/trazabilidad/screens/UpDetailScreen.test.tsx` (muestra genealogía + historial)
+- [X] T024 [P] [US2] Integration test `src/features/trazabilidad/unidadesApi.integration.test.ts` (emulador): `trasladarUnidad` cambia ubicacionId, escribe evento 'traslado', bloquea destino ocupado (FR-005..007, INV-3) — 2/2 verde
+- [X] T025 [P] [US2] Component test `src/features/trazabilidad/screens/UpDetailScreen.test.tsx` (muestra genealogía + historial) — verde; + test de TrasladarUpScreen (flujo mutación)
 
 ### Implementation for User Story 2
 
-- [ ] T026 [US2] Añadir a `src/features/trazabilidad/unidadesApi.ts`: `subscribeUnidad`, `subscribeUnidades`, `subscribeUnidadActivaPorUbicacion`, `trasladarUnidad` (con guard de ocupación INV-3)
-- [ ] T027 [P] [US2] Hooks `src/features/trazabilidad/useUnidad.ts` y `useUnidades.ts`
-- [ ] T028 [US2] `useTrasladar(upId)` en `useTrazabilidadMutations.ts`
-- [ ] T029 [US2] `src/features/trazabilidad/screens/UpDetailScreen.tsx` (detalle UP + genealogía hasta LO + historial vía useEventosPorUp)
-- [ ] T030 [US2] `src/features/trazabilidad/screens/TrasladarUpScreen.tsx` + rutas `/up/:upId` y `/up/:upId/trasladar`
+- [X] T026 [US2] Añadir a `src/features/trazabilidad/unidadesApi.ts`: `subscribeUnidad`, `subscribeUnidades`, `subscribeUnidadActivaPorUbicacion`, `trasladarUnidad` (con guard de ocupación INV-3)
+- [X] T027 [P] [US2] Hooks `src/features/trazabilidad/useUnidad.ts` y `useUnidades.ts`
+- [X] T028 [US2] `useTrasladar(upId)` en `useTrazabilidadMutations.ts`
+- [X] T029 [US2] `src/features/trazabilidad/screens/UpDetailScreen.tsx` (detalle UP + genealogía hasta LO + historial **embebido** `up.historial`, no useEventosPorUp — reconciliado)
+- [X] T030 [US2] `src/features/trazabilidad/screens/TrasladarUpScreen.tsx` (selector sobre catálogo estático UBICACIONES_SEED, excluye la actual) + rutas `/up/:upId` y `/up/:upId/trasladar`. Listado enlaza fila→detalle
 
 **Checkpoint**: US1 y US2 funcionan independientemente.
 

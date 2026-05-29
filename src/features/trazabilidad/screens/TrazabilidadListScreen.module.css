@@ -110,6 +110,14 @@
   margin-top: 6px;
 }
 
+.upLink {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  text-decoration: none;
+}
+
 .ubicacion {
   font-size: 13px;
   font-weight: 600;

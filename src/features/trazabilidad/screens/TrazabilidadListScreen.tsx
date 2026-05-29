@@ -59,12 +59,14 @@ export function TrazabilidadListScreen() {
               </p>
               {ups.map((up) => (
                 <div key={up.id} className={styles.up}>
-                  <span className={styles.ubicacion}>{up.ubicacionId}</span>
-                  <span className={styles.upCantidad}>
-                    {up.cantidad.toLocaleString('es-CL')}
-                  </span>
+                  <Link to={`/up/${up.id}`} className={styles.upLink}>
+                    <span className={styles.ubicacion}>{up.ubicacionId}</span>
+                    <span className={styles.upCantidad}>
+                      {up.cantidad.toLocaleString('es-CL')}
+                    </span>
+                  </Link>
                   <Link to={`/up/${up.id}/qr`} className={styles.qrLink}>
-                    Imprimir QR
+                    QR
                   </Link>
                 </div>
               ))}
