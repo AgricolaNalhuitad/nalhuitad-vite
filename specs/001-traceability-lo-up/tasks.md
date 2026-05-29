@@ -21,10 +21,10 @@ Vite SPA single-project, feature-organized. Módulo nuevo `src/features/trazabil
 
 **Purpose**: Dependencias y estructura base.
 
-- [ ] T001 Añadir dependencias del feature: `pnpm add qrcode.react html5-qrcode` y `pnpm add -D @playwright/test`; luego `pnpm exec playwright install chromium`
+- [X] T001 Añadir dependencias del feature: `pnpm add qrcode.react html5-qrcode` y `pnpm add -D @playwright/test`; luego `pnpm exec playwright install chromium`
 - [X] T002 [P] Crear estructura del módulo `src/features/trazabilidad/` (subcarpetas `qr/`, `screens/`) + `src/features/trazabilidad/index.ts` con barrel exports
-- [ ] T003 [P] Crear `e2e/playwright.config.ts` apuntando a la app servida sobre el emulador (baseURL, projects chromium)
-- [ ] T004 [P] Añadir script `"test:e2e": "firebase emulators:exec --only firestore,auth \"pnpm exec playwright test\""` a `package.json`
+- [X] T003 [P] Crear `e2e/playwright.config.ts` apuntando a la app servida sobre el emulador (baseURL, projects chromium)
+- [X] T004 [P] Añadir script `"test:e2e": "firebase emulators:exec --only firestore,auth \"pnpm exec playwright test\""` a `package.json`
 
 ---
 
@@ -53,7 +53,7 @@ Vite SPA single-project, feature-organized. Módulo nuevo `src/features/trazabil
 ### Tests for User Story 1 ⚠️ (escribir y ver fallar primero)
 
 - [X] T013 [P] [US1] Unit test `src/features/trazabilidad/nombreAmigable.test.ts` (genera "Milena 23-May"; sufijo "#02" en colisión mismo día — FR-003)
-- [ ] T014 [P] [US1] Integration test `src/features/trazabilidad/lotesOrigenApi.test.ts` sobre emulador: `createSiembra` crea LO + UP inicial (Inv D, cantidad = bandejas×135) atómicamente (FR-002, FR-004)
+- [X] T014 [P] [US1] Integration test `src/features/trazabilidad/lotesOrigenApi.integration.test.ts` sobre emulador: `createSiembra` crea LO + UP inicial (Inv D, cantidad = bandejas×135) atómicamente (FR-002, FR-004) — 3/3 verde; harness `vitest.integration.config.ts` + `pnpm test:integration`
 - [ ] T015 [P] [US1] Component test `src/features/trazabilidad/screens/CrearSiembraScreen.test.tsx` (form variedad/bandejas/fecha → confirma)
 
 ### Implementation for User Story 1
@@ -62,7 +62,7 @@ Vite SPA single-project, feature-organized. Módulo nuevo `src/features/trazabil
 - [X] T017 [US1] `src/features/trazabilidad/lotesOrigenApi.ts` (`subscribeLotesOrigen`, `subscribeLoteOrigen`, `createSiembra` writeBatch LO+UP + historial 'creacion') — typecheck/lint OK; comportamiento pendiente de verificar en T014 (emulador)
 - [X] T018 [P] [US1] Hooks `src/features/trazabilidad/useLotesOrigen.ts` y `useLoteOrigen.ts` (patrón RQ+Firestore)
 - [X] T019 [US1] `useCrearSiembra()` en `src/features/trazabilidad/useTrazabilidadMutations.ts` (useMutation + invalidateQueries)
-- [ ] T020 [P] [US1] Componentes QR en `src/features/trazabilidad/qr/QrCode.tsx` (wrap qrcode.react) y `qr/PrintableQr.tsx` (QR + nombre + variedad + fecha, `@media print`) — FR-020
+- [X] T020 [P] [US1] Componentes QR en `src/features/trazabilidad/qr/QrCode.tsx` (wrap qrcode.react) y `qr/PrintableQr.tsx` (QR + nombre + variedad + fecha, `@media print`) — FR-020 · test colocado verde
 - [ ] T021 [US1] `src/features/trazabilidad/screens/CrearSiembraScreen.tsx` + `screens/TrazabilidadListScreen.tsx` (listado lotes activos) hasta que T015 pase
 - [ ] T022 [US1] Registrar rutas `/trazabilidad`, `/trazabilidad/siembra`, `/up/:upId/qr` en el router (src/App.tsx o archivo de rutas)
 - [ ] T023 [US1] E2E `e2e/flujos/siembra-qr.spec.ts` + fixture `e2e/fixtures/seed.ts`: siembra → aparece en listado → QR imprimible visible
