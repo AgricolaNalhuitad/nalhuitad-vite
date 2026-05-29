@@ -1,6 +1,15 @@
 # Phase 1 Data Model: Trazabilidad LO+UP
 
-4 colecciones Firestore top-level. Refs por ID (string). Sin arrays embebidos para historial. Fechas operativas como ISO `YYYY-MM-DD` (string); timestamps de sistema como Firestore `Timestamp`.
+> **⚠ RECONCILIACIÓN 2026-05-29 — fuente de verdad: `firestore.rules` + `tests/security/firestore.rules.test.ts` (60 tests verdes).**
+> El test suite committeado se adoptó como fuente de verdad del data-model (decisión punto-por-punto). Las secciones de abajo son del plan original del deep-interview y quedan **superseded** donde contradigan esto:
+> - **Colecciones:** `loteOrigen` (singular), `unidadesProduccion`, `cosechas` (ledger append-only), `ubicaciones`, `lotes` (legacy). **No** existen `lotesOrigen` ni `eventosHistorial`.
+> - **Historial:** **embebido** `historial: []` en cada `unidadesProduccion` (D2) — no colección separada.
+> - **Cantidad:** `cantidad` **persistida y mutable** (baja en cosecha/raleo; reglas prohíben aumentarla) — supersede FR-031 "derivada" a nivel implementación (D4b).
+> - **Campos:** español (`variedad`, `cantidad`, `bandejas`, `fechaSiembra`) + audit (`createdBy`, `lastModifiedBy`, `createdAt`, `lastModifiedAt`).
+> - **Legacy:** corte limpio — sin `lotes_legacy`; `lotes` escribible hasta el switchover, luego read-only (D3).
+> - **Pendiente:** reconciliar `src/features/trazabilidad/types.ts` (+ quitar `eventosApi`/`useEventosPorUp`) a este modelo ANTES de US1.
+
+4 colecciones Firestore top-level. Refs por ID (string). Fechas operativas como ISO `YYYY-MM-DD` (string); timestamps de sistema como Firestore `Timestamp`.
 
 ## Colección `lotesOrigen/{loteOrigenId}`
 

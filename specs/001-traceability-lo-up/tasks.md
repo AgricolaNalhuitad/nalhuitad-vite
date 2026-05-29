@@ -38,8 +38,8 @@ Vite SPA single-project, feature-organized. Módulo nuevo `src/features/trazabil
 - [X] T008 [P] `src/features/trazabilidad/ubicacionesApi.ts` (`subscribeUbicaciones`) + `useUbicaciones.ts` (patrón RQ+Firestore como `useLotes.ts`)
 - [X] T009 [P] `src/features/trazabilidad/eventosApi.ts` (`subscribeEventosPorUp`) + `useEventosPorUp.ts`
 - [X] T010 Crear `scripts/seed-ubicaciones.ts` (tsx + firebase-admin) que pre-siembra las 19 ubicaciones idempotentemente (doc id `INV-X-YYY`) según seed data del spec — datos en `ubicacionesSeed.ts` (testeados); runner escrito pero **no ejecutado** (requiere creds/emulador)
-- [ ] T011 Extender `firestore.rules`: colecciones `lotesOrigen`/`unidadesProduccion`/`ubicaciones`/`eventosHistorial` con roles + inmutabilidad; `eventosHistorial` create-only; `ubicaciones` deny client-write; **`lotes` legacy deny-all-write** (zona crítica, ver contracts/firestore-rules.md)
-- [ ] T012 Tests de reglas en `tests/security/firestore.rules.test.ts` (lotes write denegado, ubicaciones client-write denegado, eventos update/delete denegado, roles en lotesOrigen/unidadesProduccion) + `pnpm test:rules` verde
+- [X] T011 Extender `firestore.rules` (RBAC): colecciones `loteOrigen`/`unidadesProduccion`/`cosechas`/`ubicaciones`/`lotes` con roles + validaciones + inmutabilidad; `cosechas` create-only; `ubicaciones` owner-only-write; `lotes` deny-delete; default-deny. Header de deploy-gating por incidente e6d4aee. (Reconciliado al test suite; sin `lotes_legacy` por corte limpio.)
+- [X] T012 Tests de reglas en `tests/security/firestore.rules.test.ts` reconciliados (quitado bloque `lotes_legacy` por corte limpio) → **`pnpm test:rules` verde: 60/60** contra emulador
 
 **Checkpoint**: Fundación lista — las user stories pueden empezar (en paralelo si hay capacidad).
 
