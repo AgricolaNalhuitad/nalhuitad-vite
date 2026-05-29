@@ -35,9 +35,9 @@ Vite SPA single-project, feature-organized. Módulo nuevo `src/features/trazabil
 - [X] T005 Definir tipos del modelo LO+UP en `src/features/trazabilidad/types.ts` (LoteOrigen, UnidadProduccion, Ubicacion, EventoHistorial + inputs NuevaSiembraInput/TrasladoInput/RaleoInput/CosechaInput) según data-model.md
 - [X] T006 [P] Tests de helpers puros en `src/features/trazabilidad/plantas.test.ts` (calcularCurrentQuantity FR-031, paquetesALechugas ×2, validarSumaRaleo INV-1) — deben FALLAR primero
 - [X] T007 [P] Implementar helpers en `src/features/trazabilidad/plantas.ts` (135/bandeja, 2/paquete, currentQuantity derivada, validación suma) hasta que T006 pase
-- [ ] T008 [P] `src/features/trazabilidad/ubicacionesApi.ts` (`subscribeUbicaciones`) + `useUbicaciones.ts` (patrón RQ+Firestore como `useLotes.ts`)
-- [ ] T009 [P] `src/features/trazabilidad/eventosApi.ts` (`subscribeEventosPorUp`) + `useEventosPorUp.ts`
-- [ ] T010 Crear `scripts/seed-ubicaciones.ts` (tsx + firebase-admin) que pre-siembra las 19 ubicaciones idempotentemente (doc id `INV-X-YYY`) según seed data del spec
+- [X] T008 [P] `src/features/trazabilidad/ubicacionesApi.ts` (`subscribeUbicaciones`) + `useUbicaciones.ts` (patrón RQ+Firestore como `useLotes.ts`)
+- [X] T009 [P] `src/features/trazabilidad/eventosApi.ts` (`subscribeEventosPorUp`) + `useEventosPorUp.ts`
+- [X] T010 Crear `scripts/seed-ubicaciones.ts` (tsx + firebase-admin) que pre-siembra las 19 ubicaciones idempotentemente (doc id `INV-X-YYY`) según seed data del spec — datos en `ubicacionesSeed.ts` (testeados); runner escrito pero **no ejecutado** (requiere creds/emulador)
 - [ ] T011 Extender `firestore.rules`: colecciones `lotesOrigen`/`unidadesProduccion`/`ubicaciones`/`eventosHistorial` con roles + inmutabilidad; `eventosHistorial` create-only; `ubicaciones` deny client-write; **`lotes` legacy deny-all-write** (zona crítica, ver contracts/firestore-rules.md)
 - [ ] T012 Tests de reglas en `tests/security/firestore.rules.test.ts` (lotes write denegado, ubicaciones client-write denegado, eventos update/delete denegado, roles en lotesOrigen/unidadesProduccion) + `pnpm test:rules` verde
 
