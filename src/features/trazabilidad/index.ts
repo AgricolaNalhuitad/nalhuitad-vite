@@ -5,3 +5,7 @@ export * from './nombreAmigable';
 export * from './ubicacionesSeed';
 export * from './ubicacionesApi';
 export * from './useUbicaciones';
+export * from './lotesOrigenApi';
+export * from './useLotesOrigen';
+export * from './useLoteOrigen';
+export * from './useTrazabilidadMutations';

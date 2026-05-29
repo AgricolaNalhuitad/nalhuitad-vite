@@ -59,9 +59,9 @@ Vite SPA single-project, feature-organized. Módulo nuevo `src/features/trazabil
 ### Implementation for User Story 1
 
 - [X] T016 [P] [US1] Implementar `src/features/trazabilidad/nombreAmigable.ts` (generación + sufijo colisión) hasta que T013 pase
-- [ ] T017 [US1] `src/features/trazabilidad/lotesOrigenApi.ts` (`subscribeLotesOrigen`, `subscribeLoteOrigen`, `createSiembra` con writeBatch LO+UP+evento 'creacion') — depende de T005, T016
-- [ ] T018 [P] [US1] Hooks `src/features/trazabilidad/useLotesOrigen.ts` y `useLoteOrigen.ts` (patrón RQ+Firestore)
-- [ ] T019 [US1] `useCrearSiembra()` en `src/features/trazabilidad/useTrazabilidadMutations.ts` (useMutation + invalidateQueries)
+- [X] T017 [US1] `src/features/trazabilidad/lotesOrigenApi.ts` (`subscribeLotesOrigen`, `subscribeLoteOrigen`, `createSiembra` writeBatch LO+UP + historial 'creacion') — typecheck/lint OK; comportamiento pendiente de verificar en T014 (emulador)
+- [X] T018 [P] [US1] Hooks `src/features/trazabilidad/useLotesOrigen.ts` y `useLoteOrigen.ts` (patrón RQ+Firestore)
+- [X] T019 [US1] `useCrearSiembra()` en `src/features/trazabilidad/useTrazabilidadMutations.ts` (useMutation + invalidateQueries)
 - [ ] T020 [P] [US1] Componentes QR en `src/features/trazabilidad/qr/QrCode.tsx` (wrap qrcode.react) y `qr/PrintableQr.tsx` (QR + nombre + variedad + fecha, `@media print`) — FR-020
 - [ ] T021 [US1] `src/features/trazabilidad/screens/CrearSiembraScreen.tsx` + `screens/TrazabilidadListScreen.tsx` (listado lotes activos) hasta que T015 pase
 - [ ] T022 [US1] Registrar rutas `/trazabilidad`, `/trazabilidad/siembra`, `/up/:upId/qr` en el router (src/App.tsx o archivo de rutas)
