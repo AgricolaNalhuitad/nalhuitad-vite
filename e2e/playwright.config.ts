@@ -18,10 +18,11 @@ const BASE_URL = `http://127.0.0.1:${PORT}`;
 export default defineConfig({
   testDir: './flujos',
   globalSetup: './fixtures/seed.ts',
-  fullyParallel: true,
+  // Serial: los specs comparten el estado del emulador, evitamos carreras entre ellos.
+  fullyParallel: false,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
+  workers: 1,
   reporter: 'html',
   use: {
     baseURL: BASE_URL,

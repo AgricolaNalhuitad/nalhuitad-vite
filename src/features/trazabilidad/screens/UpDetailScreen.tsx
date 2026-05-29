@@ -89,8 +89,11 @@ export function UpDetailScreen() {
           <Link to={`/up/${up.id}/trasladar`} className={styles.action}>
             Trasladar
           </Link>
+          <Link to={`/up/${up.id}/ralear`} className={styles.action}>
+            Ralear
+          </Link>
           <Link to={`/up/${up.id}/qr`} className={styles.actionSecondary}>
-            Imprimir QR
+            QR
           </Link>
         </div>
       )}

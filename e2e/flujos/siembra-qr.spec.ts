@@ -25,5 +25,5 @@ test('siembra Milena: crea, navega al QR imprimible y aparece en el listado', as
   await page.getByRole('button', { name: /volver/i }).click();
   await expect(page).toHaveURL(/\/trazabilidad$/);
   await expect(page.getByText(/Milena/).first()).toBeVisible();
-  await expect(page.getByRole('link', { name: /imprimir qr/i }).first()).toBeVisible();
+  await expect(page.getByRole('link', { name: 'QR', exact: true }).first()).toBeVisible();
 });

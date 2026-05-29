@@ -100,16 +100,16 @@ Vite SPA single-project, feature-organized. Módulo nuevo `src/features/trazabil
 
 ### Tests for User Story 3 ⚠️
 
-- [ ] T031 [P] [US3] Integration test `src/features/trazabilidad/raleoApi.test.ts` (emulador): writeBatch atómico crea N hijas + origen 'trasladada' + libera ubicación; rollback si falla (FR-012); bloquea suma≠ (INV-1)
-- [ ] T032 [P] [US3] Component test `src/features/trazabilidad/screens/RalearUpScreen.test.tsx` (multi-destino, advertencia capacidad sin bloqueo FR-013, bloqueo offline)
+- [X] T031 [P] [US3] Integration test `src/features/trazabilidad/raleoApi.integration.test.ts` (emulador): writeBatch atómico crea N hijas + origen 'trasladada' + libera ubicación; rollback si falla (FR-012); bloquea suma≠ (INV-1); bloquea destino ocupado (INV-3) — 3/3 verde
+- [X] T032 [P] [US3] Component test `src/features/trazabilidad/screens/RalearUpScreen.test.tsx` (multi-destino, advertencia capacidad sin bloqueo FR-013, bloqueo offline) — 3/3 verde
 
 ### Implementation for User Story 3
 
-- [ ] T033 [P] [US3] `src/features/trazabilidad/useFirestoreConnectivity.ts` (deriva isOnline de metadata.fromCache + navigator.onLine)
-- [ ] T034 [US3] `src/features/trazabilidad/raleoApi.ts` (`ralear` con writeBatch atómico, validación suma, gate online) — depende de T005, T007
-- [ ] T035 [US3] `useRalear(upOrigenId)` en `useTrazabilidadMutations.ts` + borrador local con zustand+localStorage (restaura al reconectar, FR-014)
-- [ ] T036 [US3] `src/features/trazabilidad/screens/RalearUpScreen.tsx` (1-5 destinos, validación suma en vivo, advertencia capacidad, confirmar deshabilitado offline) + ruta `/up/:upId/ralear`
-- [ ] T037 [US3] E2E `e2e/flujos/raleo-multidestino.spec.ts`: raleo 3 destinos OK + guardrails (suma no cuadra bloquea, ubicación ocupada bloquea)
+- [X] T033 [P] [US3] `src/features/trazabilidad/useFirestoreConnectivity.ts` (deriva isOnline de metadata.fromCache + navigator.onLine)
+- [X] T034 [US3] `src/features/trazabilidad/raleoApi.ts` (`ralear` con writeBatch atómico, validación suma INV-1, guard INV-3, gate online FR-014) — depende de T005, T007
+- [X] T035 [US3] `useRalear(upOrigenId)` en `useTrazabilidadMutations.ts` + borrador local `raleoDraftStore.ts` (zustand+persist localStorage, restaura al reconectar, FR-014)
+- [X] T036 [US3] `src/features/trazabilidad/screens/RalearUpScreen.tsx` (1-5 destinos, validación suma en vivo, advertencia capacidad, confirmar deshabilitado offline) + ruta `/up/:upId/ralear`. Acción "Ralear" en UpDetailScreen
+- [X] T037 [US3] E2E `e2e/flujos/raleo-multidestino.spec.ts`: raleo 3 destinos OK + guardrail (suma no cuadra bloquea confirmar) — 1 passed sobre emulador (runner ahora serial)
 
 **Checkpoint**: US1-US3 funcionan independientemente.
 

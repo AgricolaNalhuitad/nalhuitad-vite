@@ -15,6 +15,7 @@ import {
   QrPrintScreen,
   UpDetailScreen,
   TrasladarUpScreen,
+  RalearUpScreen,
 } from '@/features/trazabilidad';
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -68,6 +69,14 @@ export const appRouter = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <TrasladarUpScreen />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/up/:upId/ralear',
+    element: (
+      <ProtectedRoute>
+        <RalearUpScreen />
       </ProtectedRoute>
     ),
   },
