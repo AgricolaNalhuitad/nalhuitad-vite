@@ -53,10 +53,10 @@ export const db: Firestore = initializeFirestore(app, {
   }),
 });
 
-// Solo dev/E2E: conecta a los emuladores cuando VITE_USE_EMULATOR === 'true'.
-// En el build de producción esa variable nunca se define, así que este bloque no corre
-// y la app habla con Firebase real. Cambio en zona crítica → revisar con code-review --ultra.
-if (import.meta.env.VITE_USE_EMULATOR === 'true') {
+// Solo dev/E2E: conecta a los emuladores. Doble guarda (defensa en profundidad, zona crítica):
+// `import.meta.env.DEV` garantiza que un build de producción NUNCA conecte a emuladores locales
+// aunque `VITE_USE_EMULATOR` se filtrara por error; el flag explícito activa el modo en dev/E2E.
+if (import.meta.env.DEV && import.meta.env.VITE_USE_EMULATOR === 'true') {
   connectAuthEmulator(auth, 'http://127.0.0.1:9099', { disableWarnings: true });
   connectFirestoreEmulator(db, '127.0.0.1', 8080);
 }
