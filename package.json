@@ -13,6 +13,7 @@
     "test": "vitest",
     "test:run": "vitest run",
     "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage",
     "test:rules": "firebase emulators:exec --only firestore \"vitest run --config vitest.security.config.ts\"",
     "test:integration": "firebase emulators:exec --only firestore \"vitest run --config vitest.integration.config.ts\"",
     "test:e2e": "firebase emulators:exec --project=demo-nalhuitad --only firestore,auth \"pnpm exec playwright test --config=e2e/playwright.config.ts\"",

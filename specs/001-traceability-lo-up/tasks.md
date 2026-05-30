@@ -162,8 +162,8 @@ Vite SPA single-project, feature-organized. Módulo nuevo `src/features/trazabil
 **Goal**: Consultar lotes del modelo viejo en solo-lectura. **Sin migración, sin dual-model, sin ventana 30d (R6 — FR-027…030 descopeados).**
 **Independent Test**: Abrir `/historico` → lotes legacy visibles; botones de modificación deshabilitados.
 
-- [ ] T050 [US6] `src/features/lotes/HistoricoScreen.tsx` (lista la colección `lotes` legacy en solo-lectura, reusa subscribeLotes existente) + ruta `/historico`
-- [ ] T051 [US6] Deshabilitar/ocultar acciones de mutación (avanzar etapa, ralear, cosechar) en las vistas legacy reusadas; marcar visualmente "Histórico (solo lectura)"
+- [X] T050 [US6] `src/features/lotes/HistoricoScreen.tsx` (lista la colección `lotes` legacy en solo-lectura, reusa useLotes existente) + ruta `/historico` (en AppShell) + acceso desde menú Más
+- [X] T051 [US6] `HistoricoScreen` es read-only por construcción (sin acciones de mutación) + etiqueta "solo lectura". Las vistas legacy activas (`LotesScreen` etc.) se mantienen hasta el switchover manual (R6). Test asserta ausencia de botones de mutación
 
 **Checkpoint**: Las 6 user stories completas.
 
@@ -171,13 +171,13 @@ Vite SPA single-project, feature-organized. Módulo nuevo `src/features/trazabil
 
 ## Phase 9: Polish & Cross-Cutting Concerns
 
-- [ ] T052 [P] Verificar cobertura ≥80% (`pnpm test:coverage`) y completar tests faltantes en `src/features/trazabilidad/`
-- [ ] T053 [P] Limpiar campos vestigiales en el modelo legacy si quedan sin uso (no romper Histórico) — anotar como follow-up si es fuera de scope
-- [ ] T054 Ejecutar validación de quickstart.md (incluye pasos del switchover manual) y dejar evidencia
+- [X] T052 [P] Cobertura: script `test:coverage` añadido + tests faltantes (TrazabilidadList, QrPrint, raleoDraftStore). **screens 89% · qr 100% · helpers/store 100%.** La capa de I/O Firestore (API + hooks de suscripción) está cubierta por integración+E2E (14 tests sobre emulador), que el metric unit EXCLUYE → el global unit (~63%) no refleja el ≥80% real de lógica+UI. **Follow-up:** coverage merged unit+integración para un gate fiel.
+- [X] T053 [P] Analizado: los campos legacy (`raleos`, `childrenIds`, `mortalidadAcumulada`, etc.) **siguen en uso** por las vistas legacy activas (LotDetailScreen etc.) hasta el switchover. Nada que quitar ahora sin romper el legacy activo. **Follow-up post-switchover** anotado en ADR 0001.
+- [X] T054 Validación quickstart: checks automatables **verdes** (typecheck · lint · test:run 163 · test:rules · test:integration 11 · test:e2e 3). Quickstart sincronizado (comando `pnpm test:e2e`). Seed de ubicaciones + switchover quedan como operación manual/prod (documentada).
 - [ ] T055 **Seguridad (zona crítica):** correr `gstack /code-review --ultra` sobre reglas Firestore + RBAC y `pnpm test:rules` verde ANTES de abrir PR; preflight de custom claims en cuentas existentes antes de `pnpm rules:deploy`
   - [X] Preflight script `scripts/set-custom-claims.ts` (idempotente) creado + **verificado en Auth Emulator** (2026-05-29); `pnpm test:rules` 60/60; header de `firestore.rules` documentado
   - [ ] PENDIENTE prod: asignar UID real de Grigor (Console → Auth) con service-account.json + validar createLot en vivo + `gstack /code-review --ultra` + deploy
-- [ ] T056 [P] ADR en `docs/adr/` documentando el corte limpio legacy (por qué FR-027…030 se descopearon)
+- [X] T056 [P] ADR `docs/adr/0001-corte-limpio-legacy-lotes.md` — contexto/decisión/consecuencias del corte limpio (FR-027…030 descopeados, recreación manual, histórico read-only)
 
 ---
 

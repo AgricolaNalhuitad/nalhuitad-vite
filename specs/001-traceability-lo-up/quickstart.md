@@ -39,10 +39,10 @@ pnpm rules:deploy   # deploy reglas a producción
 ## E2E (Playwright sobre emulador)
 
 ```bash
-firebase emulators:exec --only firestore,auth "pnpm exec playwright test"
+pnpm test:e2e       # firebase emulators:exec (proyecto demo-nalhuitad) → playwright serial
 ```
 
-Flujos cubiertos: siembra→QR · raleo 3 destinos · cosecha→auto-cierre LO. Guardrails aserttados: ubicación ocupada · suma de raleo no cuadra · cosecha excede.
+Flujos cubiertos (verde): siembra→QR · raleo 3 destinos · cosecha→auto-cierre LO. Guardrails E2E: suma de raleo no cuadra · cosecha excede (INV-4). El guardrail de ubicación ocupada (INV-3) se cubre en integración (`pnpm test:integration`). **US5 (escaneo QR / consulta por ubicación, SC-004) queda fuera de este corte.**
 
 ## Verificación de éxito (mapea a Success Criteria)
 
