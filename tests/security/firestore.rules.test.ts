@@ -245,6 +245,30 @@ describe('loteOrigen update', () => {
     );
   });
 
+  it('rejects changing cantidadInicial (debe seguir pineado a bandejas*135)', async () => {
+    await assertFails(
+      updateDoc(doc(operatorDb(), 'loteOrigen/l1'), {
+        cantidadInicial: 999,
+        lastModifiedBy: OPERATOR_UID,
+      }),
+    );
+  });
+
+  it('rejects reabrir un lote cosechado (transición terminal → activo)', async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(
+        doc(ctx.firestore() as unknown as Firestore, 'loteOrigen/l1'),
+        validLoteOrigen({ estado: 'cosechado' }),
+      );
+    });
+    await assertFails(
+      updateDoc(doc(operatorDb(), 'loteOrigen/l1'), {
+        estado: 'activo',
+        lastModifiedBy: OPERATOR_UID,
+      }),
+    );
+  });
+
   it('rejects changing createdBy (audit trail)', async () => {
     await assertFails(
       updateDoc(doc(operatorDb(), 'loteOrigen/l1'), {
@@ -378,6 +402,39 @@ describe('unidadesProduccion update', () => {
     await assertFails(
       updateDoc(doc(operatorDb(), 'unidadesProduccion/up1'), {
         cantidad: 600,
+        lastModifiedBy: OPERATOR_UID,
+      }),
+    );
+  });
+
+  it('rejects negative cantidad on update (piso >= 0)', async () => {
+    await assertFails(
+      updateDoc(doc(operatorDb(), 'unidadesProduccion/up1'), {
+        cantidad: -10,
+        lastModifiedBy: OPERATOR_UID,
+      }),
+    );
+  });
+
+  it('rejects invalid etapa on update (re-valida stageValid)', async () => {
+    await assertFails(
+      updateDoc(doc(operatorDb(), 'unidadesProduccion/up1'), {
+        etapa: 'germinacion',
+        lastModifiedBy: OPERATOR_UID,
+      }),
+    );
+  });
+
+  it('rejects reactivar una UP terminal (cosechada → activa)', async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(
+        doc(ctx.firestore() as unknown as Firestore, 'unidadesProduccion/up1'),
+        validUP({ estado: 'cosechada', cantidad: 0 }),
+      );
+    });
+    await assertFails(
+      updateDoc(doc(operatorDb(), 'unidadesProduccion/up1'), {
+        estado: 'activa',
         lastModifiedBy: OPERATOR_UID,
       }),
     );

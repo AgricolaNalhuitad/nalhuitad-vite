@@ -71,8 +71,10 @@ service cloud.firestore {
              ['nombre', 'variedad', 'fechaSiembra', 'bandejas', 'cantidadInicial', 'estado', 'notas', 'createdAt', 'createdBy', 'lastModifiedBy', 'lastModifiedAt'])
         && request.resource.data.variedad == resource.data.variedad
         && request.resource.data.bandejas == resource.data.bandejas
+        && request.resource.data.cantidadInicial == resource.data.cantidadInicial
         && request.resource.data.createdBy == resource.data.createdBy
-        && request.resource.data.estado in ['activo', 'cosechado', 'descartado'];
+        && request.resource.data.estado in ['activo', 'cosechado', 'descartado']
+        && (resource.data.estado == 'activo' || request.resource.data.estado == resource.data.estado);
       allow delete: if false;
     }
 
@@ -98,8 +100,11 @@ service cloud.firestore {
         && request.resource.data.refLoteOrigen == resource.data.refLoteOrigen
         && request.resource.data.get('parentUpId', '') == resource.data.get('parentUpId', '')
         && request.resource.data.cantidad is int
+        && request.resource.data.cantidad >= 0
         && request.resource.data.cantidad <= resource.data.cantidad
+        && stageValid(request.resource.data.etapa)
         && request.resource.data.estado in ['activa', 'cosechada', 'descartada', 'trasladada']
+        && (resource.data.estado == 'activa' || request.resource.data.estado == resource.data.estado)
         && validUbicacionId(request.resource.data.ubicacionId);
       allow delete: if false;
     }
