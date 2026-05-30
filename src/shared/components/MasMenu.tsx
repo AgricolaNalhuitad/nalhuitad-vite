@@ -21,6 +21,9 @@ export function MasMenu() {
         <Link to="/trazabilidad" className={styles.item}>
           Trazabilidad
         </Link>
+        <Link to="/historico" className={styles.item}>
+          Histórico
+        </Link>
         {ITEMS.map((item) => (
           <Link key={item.slug} to={`/mas/${item.slug}`} className={styles.item}>
             {item.label}

@@ -9,6 +9,7 @@ import { LotesScreen } from '@/features/lotes/LotesScreen';
 import { LotDetailScreen } from '@/features/lotes/LotDetailScreen';
 import { CreateLotScreen } from '@/features/lotes/CreateLotScreen';
 import { EditLotScreen } from '@/features/lotes/EditLotScreen';
+import { HistoricoScreen } from '@/features/lotes/HistoricoScreen';
 import {
   CrearSiembraScreen,
   TrazabilidadListScreen,
@@ -50,6 +51,7 @@ export const appRouter = createBrowserRouter([
       { path: 'lotes/:id/editar', element: <EditLotScreen /> },
       { path: 'trazabilidad',         element: <TrazabilidadListScreen /> },
       { path: 'trazabilidad/siembra', element: <CrearSiembraScreen /> },
+      { path: 'historico',            element: <HistoricoScreen /> },
       { path: 'dashboard',  element: <PlaceholderScreen name="Dashboard" /> },
       { path: 'alertas',    element: <PlaceholderScreen name="Alertas" /> },
       { path: 'produccion', element: <PlaceholderScreen name="Producción" /> },
