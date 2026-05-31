@@ -245,6 +245,30 @@ describe('loteOrigen update', () => {
     );
   });
 
+  it('rejects changing cantidadInicial (debe seguir pineado a bandejas*135)', async () => {
+    await assertFails(
+      updateDoc(doc(operatorDb(), 'loteOrigen/l1'), {
+        cantidadInicial: 999,
+        lastModifiedBy: OPERATOR_UID,
+      }),
+    );
+  });
+
+  it('rejects reabrir un lote cosechado (transición terminal → activo)', async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(
+        doc(ctx.firestore() as unknown as Firestore, 'loteOrigen/l1'),
+        validLoteOrigen({ estado: 'cosechado' }),
+      );
+    });
+    await assertFails(
+      updateDoc(doc(operatorDb(), 'loteOrigen/l1'), {
+        estado: 'activo',
+        lastModifiedBy: OPERATOR_UID,
+      }),
+    );
+  });
+
   it('rejects changing createdBy (audit trail)', async () => {
     await assertFails(
       updateDoc(doc(operatorDb(), 'loteOrigen/l1'), {
@@ -378,6 +402,39 @@ describe('unidadesProduccion update', () => {
     await assertFails(
       updateDoc(doc(operatorDb(), 'unidadesProduccion/up1'), {
         cantidad: 600,
+        lastModifiedBy: OPERATOR_UID,
+      }),
+    );
+  });
+
+  it('rejects negative cantidad on update (piso >= 0)', async () => {
+    await assertFails(
+      updateDoc(doc(operatorDb(), 'unidadesProduccion/up1'), {
+        cantidad: -10,
+        lastModifiedBy: OPERATOR_UID,
+      }),
+    );
+  });
+
+  it('rejects invalid etapa on update (re-valida stageValid)', async () => {
+    await assertFails(
+      updateDoc(doc(operatorDb(), 'unidadesProduccion/up1'), {
+        etapa: 'germinacion',
+        lastModifiedBy: OPERATOR_UID,
+      }),
+    );
+  });
+
+  it('rejects reactivar una UP terminal (cosechada → activa)', async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(
+        doc(ctx.firestore() as unknown as Firestore, 'unidadesProduccion/up1'),
+        validUP({ estado: 'cosechada', cantidad: 0 }),
+      );
+    });
+    await assertFails(
+      updateDoc(doc(operatorDb(), 'unidadesProduccion/up1'), {
+        estado: 'activa',
         lastModifiedBy: OPERATOR_UID,
       }),
     );
@@ -575,33 +632,9 @@ describe('lotes (legacy activo, pre-switchover)', () => {
   });
 });
 
-// ============================================================
-// LOTES_LEGACY — destino del switchover, read-only definitivo
-// ============================================================
-describe('lotes_legacy (post-switchover, read-only)', () => {
-  beforeEach(async () => {
-    await testEnv.withSecurityRulesDisabled(async (ctx) => {
-      const db = ctx.firestore() as unknown as Firestore;
-      await setDoc(doc(db, 'lotes_legacy/legacy2'), { name: 'archived' });
-    });
-  });
-
-  it('operator can read lotes_legacy', async () => {
-    await assertSucceeds(getDoc(doc(operatorDb(), 'lotes_legacy/legacy2')));
-  });
-
-  it('denies write even to owner', async () => {
-    await assertFails(updateDoc(doc(ownerDb(), 'lotes_legacy/legacy2'), { name: 'tampered' }));
-  });
-
-  it('denies create in lotes_legacy', async () => {
-    await assertFails(setDoc(doc(operatorDb(), 'lotes_legacy/new1'), { name: 'inject' }));
-  });
-
-  it('denies delete in lotes_legacy', async () => {
-    await assertFails(deleteDoc(doc(ownerDb(), 'lotes_legacy/legacy2')));
-  });
-});
+// LOTES_LEGACY: eliminado — corte limpio (R6, reconciliación 2026-05-28).
+// Sin colección de migración; los lotes viejos se consultan read-only desde
+// la colección `lotes` (vista Histórico). Default-deny cubre `lotes_legacy`.
 
 // ============================================================
 // UBICACIONES — catálogo

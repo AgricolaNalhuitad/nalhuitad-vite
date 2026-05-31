@@ -1,20 +1,149 @@
 rules_version = '2';
 
 // ============================================================
-// ROLLBACK TEMPORAL — 2026-05-24
-// Incidente: rules de commit e6d4aee causaban logout en producción
-// al crear lote. Diagnóstico en curso (probable: falta custom claim
-// 'role' en cuenta de Grigor → isOperator() retorna false → denied).
+// Sistema de Trazabilidad LO+UP — Sprint 4 (RBAC)
 //
-// Estas reglas restauran el estado previo (auth-only, sin RBAC) hasta
-// que (1) se asigne el claim 'role: owner' al UID de Grigor vía
-// Admin SDK, y (2) se valide nuevamente con la app en vivo.
+// ⚠️ DEPLOY GATING — incidente e6d4aee (2026-05-24):
+// Estas reglas exigen el custom claim `role` (owner|operator) en las cuentas.
+//
+// PREFLIGHT (T055):
+//   - Script idempotente: scripts/set-custom-claims.ts (Admin SDK).
+//   - 2026-05-29: VERIFICADO en Auth Emulator — claim `owner` aplicado e idempotente;
+//     `pnpm test:rules` 60/60 confirma isOwner()/isOperator() con el claim presente.
+//   - UIDs reales de PROD: NO confirmados aún en este repo (no se tocó prod Auth).
+//     Obtener el UID de Grigor en Firebase Console → Authentication → Users.
+//
+// ANTES de `firebase deploy --only firestore:rules` / `pnpm rules:deploy`:
+//   1. (PROD, con service-account.json en la raíz)
+//        pnpm tsx scripts/set-custom-claims.ts --owner <uid-grigor> [--operator <uid-socio>]
+//   2. Validar en vivo (crear lote) que NO hay permission-denied silencioso.
+// Deployar sin el preflight reproduce el logout en producción.
+// Revisar con `gstack /code-review --ultra` antes de deploy.
 // ============================================================
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if request.auth != null;
+
+    function isSignedIn() {
+      return request.auth != null;
     }
+    function hasRole(role) {
+      return isSignedIn() && request.auth.token.role == role;
+    }
+    function isOperator() {
+      return hasRole('operator') || hasRole('owner');
+    }
+    function isOwner() {
+      return hasRole('owner');
+    }
+    function ownedByCaller() {
+      return request.resource.data.createdBy == request.auth.uid;
+    }
+    function isIsoDate(v) {
+      return v is string && v.matches('^\\d{4}-\\d{2}-\\d{2}$');
+    }
+    function validUbicacionId(id) {
+      return id is string && id.matches('^INV-[A-D]-[A-Z0-9]+$');
+    }
+    function stageValid(s) {
+      return s in ['almacigo', 'transplante', 'raleo', 'cosecha'];
+    }
+
+    // ---------- loteOrigen (genealogía) ----------
+    match /loteOrigen/{id} {
+      allow read: if isOperator();
+      allow create: if isOperator()
+        && ownedByCaller()
+        && request.resource.data.keys().hasAll(
+             ['nombre', 'variedad', 'fechaSiembra', 'bandejas', 'cantidadInicial', 'estado', 'createdAt', 'createdBy'])
+        && request.resource.data.keys().hasOnly(
+             ['nombre', 'variedad', 'fechaSiembra', 'bandejas', 'cantidadInicial', 'estado', 'notas', 'createdAt', 'createdBy', 'lastModifiedBy', 'lastModifiedAt'])
+        && request.resource.data.variedad is string
+        && request.resource.data.variedad.size() > 0
+        && request.resource.data.bandejas is int
+        && request.resource.data.bandejas > 0
+        && request.resource.data.bandejas <= 100
+        && request.resource.data.cantidadInicial == request.resource.data.bandejas * 135
+        && request.resource.data.estado == 'activo'
+        && isIsoDate(request.resource.data.fechaSiembra);
+      allow update: if isOperator()
+        && request.resource.data.keys().hasOnly(
+             ['nombre', 'variedad', 'fechaSiembra', 'bandejas', 'cantidadInicial', 'estado', 'notas', 'createdAt', 'createdBy', 'lastModifiedBy', 'lastModifiedAt'])
+        && request.resource.data.variedad == resource.data.variedad
+        && request.resource.data.bandejas == resource.data.bandejas
+        && request.resource.data.cantidadInicial == resource.data.cantidadInicial
+        && request.resource.data.createdBy == resource.data.createdBy
+        && request.resource.data.estado in ['activo', 'cosechado', 'descartado']
+        && (resource.data.estado == 'activo' || request.resource.data.estado == resource.data.estado);
+      allow delete: if false;
+    }
+
+    // ---------- unidadesProduccion (presencia física) ----------
+    match /unidadesProduccion/{id} {
+      allow read: if isOperator();
+      allow create: if isOperator()
+        && ownedByCaller()
+        && request.resource.data.keys().hasAll(
+             ['refLoteOrigen', 'ubicacionId', 'cantidad', 'etapa', 'estado', 'fechaIngreso', 'createdAt', 'createdBy'])
+        && request.resource.data.keys().hasOnly(
+             ['refLoteOrigen', 'parentUpId', 'ubicacionId', 'cantidad', 'etapa', 'estado', 'fechaIngreso', 'historial', 'createdAt', 'createdBy', 'lastModifiedBy', 'lastModifiedAt'])
+        && request.resource.data.refLoteOrigen is string
+        && request.resource.data.refLoteOrigen.size() > 0
+        && validUbicacionId(request.resource.data.ubicacionId)
+        && request.resource.data.cantidad is int
+        && request.resource.data.cantidad > 0
+        && stageValid(request.resource.data.etapa)
+        && request.resource.data.estado == 'activa';
+      allow update: if isOperator()
+        && request.resource.data.keys().hasOnly(
+             ['refLoteOrigen', 'parentUpId', 'ubicacionId', 'cantidad', 'etapa', 'estado', 'fechaIngreso', 'historial', 'createdAt', 'createdBy', 'lastModifiedBy', 'lastModifiedAt'])
+        && request.resource.data.refLoteOrigen == resource.data.refLoteOrigen
+        && request.resource.data.get('parentUpId', '') == resource.data.get('parentUpId', '')
+        && request.resource.data.cantidad is int
+        && request.resource.data.cantidad >= 0
+        && request.resource.data.cantidad <= resource.data.cantidad
+        && stageValid(request.resource.data.etapa)
+        && request.resource.data.estado in ['activa', 'cosechada', 'descartada', 'trasladada']
+        && (resource.data.estado == 'activa' || request.resource.data.estado == resource.data.estado)
+        && validUbicacionId(request.resource.data.ubicacionId);
+      allow delete: if false;
+    }
+
+    // ---------- cosechas (ledger append-only) ----------
+    match /cosechas/{id} {
+      allow read: if isOperator();
+      allow create: if isOperator()
+        && ownedByCaller()
+        && request.resource.data.keys().hasAll(
+             ['refUnidadProduccion', 'refLoteOrigen', 'paquetes', 'descarte', 'lechugasEquivalentes', 'fecha', 'createdAt', 'createdBy'])
+        && request.resource.data.keys().hasOnly(
+             ['refUnidadProduccion', 'refLoteOrigen', 'paquetes', 'descarte', 'lechugasEquivalentes', 'fecha', 'notas', 'createdAt', 'createdBy'])
+        && request.resource.data.paquetes is int
+        && request.resource.data.paquetes > 0
+        && request.resource.data.paquetes <= 210
+        && request.resource.data.descarte is int
+        && request.resource.data.descarte >= 0
+        && request.resource.data.lechugasEquivalentes == request.resource.data.paquetes * 2;
+      allow update, delete: if false;
+    }
+
+    // ---------- ubicaciones (catálogo) ----------
+    match /ubicaciones/{id} {
+      allow read: if isSignedIn();
+      allow create, update: if isOwner() && validUbicacionId(id);
+      allow delete: if false;
+    }
+
+    // ---------- lotes (modelo legacy, activo pre-switchover) ----------
+    // Tras el switchover (corte limpio), esta colección pasa a solo-lectura.
+    match /lotes/{id} {
+      allow read: if isOperator();
+      allow create, update: if isOperator()
+        && stageValid(request.resource.data.get('stage', 'almacigo'))
+        && request.resource.data.get('quantity', 0) >= 0;
+      allow delete: if false;
+    }
+
+    // Default deny: cualquier colección no declarada queda denegada.
   }
 }

@@ -1,0 +1,60 @@
+.screen {
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  background: var(--bg-1);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 360px;
+}
+
+.back,
+.print {
+  padding: 9px 16px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.back {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-1);
+}
+
+.print {
+  background: var(--green);
+  color: #0f1219;
+}
+
+.muted {
+  color: var(--text-3);
+  font-size: 14px;
+  padding: 24px 0;
+}
+
+.labelWrap {
+  display: flex;
+  justify-content: center;
+}
+
+@media print {
+  .screen {
+    min-height: auto;
+    padding: 0;
+    background: #ffffff;
+  }
+
+  .header {
+    display: none;
+  }
+}

@@ -1,0 +1,37 @@
+.label {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 20px;
+  /* Etiqueta física para imprimir: blanco/negro fijos (legibilidad de QR + papel),
+     no tokens de tema. */
+  background: #ffffff;
+  color: #111111;
+  border: 1px solid #d0d0d0;
+  border-radius: 10px;
+}
+
+.meta {
+  text-align: center;
+}
+
+.nombre {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.dato {
+  margin: 2px 0 0;
+  font-size: 0.95rem;
+  color: #333333;
+}
+
+@media print {
+  .label {
+    border: none;
+    border-radius: 0;
+    padding: 0;
+  }
+}

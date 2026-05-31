@@ -13,7 +13,10 @@
     "test": "vitest",
     "test:run": "vitest run",
     "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage",
     "test:rules": "firebase emulators:exec --only firestore \"vitest run --config vitest.security.config.ts\"",
+    "test:integration": "firebase emulators:exec --only firestore \"vitest run --config vitest.integration.config.ts\"",
+    "test:e2e": "firebase emulators:exec --project=demo-nalhuitad --only firestore,auth \"pnpm exec playwright test --config=e2e/playwright.config.ts\"",
     "rules:deploy": "firebase deploy --only firestore:rules --project=nalhuitad-d6758"
   },
   "devEngines": {
@@ -26,6 +29,8 @@
   "dependencies": {
     "@tanstack/react-query": "^5.100.10",
     "firebase": "^10.14.1",
+    "html5-qrcode": "^2.3.8",
+    "qrcode.react": "^4.2.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "react-router-dom": "^7.15.1",
@@ -34,6 +39,7 @@
   "devDependencies": {
     "@eslint/js": "^9.39.4",
     "@firebase/rules-unit-testing": "^3.0.4",
+    "@playwright/test": "^1.60.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
@@ -46,10 +52,12 @@
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.2",
+    "firebase-admin": "^13.10.0",
     "firebase-tools": "^13.29.1",
     "globals": "^17.6.0",
     "jsdom": "^25.0.1",
     "prettier": "^3.8.3",
+    "tsx": "^4.22.3",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.59.3",
     "vite": "^6.4.2",

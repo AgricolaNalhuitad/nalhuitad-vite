@@ -5,6 +5,10 @@ import type { Lot } from './types';
 
 export const LOTES_QUERY_KEY = ['lotes'] as const;
 
+// Patrón híbrido: Firestore onSnapshot alimenta el cache de React Query vía setQueryData.
+// useQuery nunca resuelve su queryFn (promesa infinita) — solo sirve como almacén reactivo.
+// Esto da acceso a React Query DevTools, estado loading/error uniforme con el resto de la app,
+// y cache compartido si varios componentes llaman a useLotes simultáneamente.
 export function useLotes() {
   const qc = useQueryClient();
   const [retryCount, setRetryCount] = useState(0);

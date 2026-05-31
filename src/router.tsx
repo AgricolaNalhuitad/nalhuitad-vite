@@ -9,6 +9,16 @@ import { LotesScreen } from '@/features/lotes/LotesScreen';
 import { LotDetailScreen } from '@/features/lotes/LotDetailScreen';
 import { CreateLotScreen } from '@/features/lotes/CreateLotScreen';
 import { EditLotScreen } from '@/features/lotes/EditLotScreen';
+import { HistoricoScreen } from '@/features/lotes/HistoricoScreen';
+import {
+  CrearSiembraScreen,
+  TrazabilidadListScreen,
+  QrPrintScreen,
+  UpDetailScreen,
+  TrasladarUpScreen,
+  RalearUpScreen,
+  CosecharUpScreen,
+} from '@/features/trazabilidad';
 
 // eslint-disable-next-line react-refresh/only-export-components
 function MasSubScreen() {
@@ -39,12 +49,55 @@ export const appRouter = createBrowserRouter([
       { path: 'lotes/nuevo',      element: <CreateLotScreen /> },
       { path: 'lotes/:id',        element: <LotDetailScreen /> },
       { path: 'lotes/:id/editar', element: <EditLotScreen /> },
+      { path: 'trazabilidad',         element: <TrazabilidadListScreen /> },
+      { path: 'trazabilidad/siembra', element: <CrearSiembraScreen /> },
+      { path: 'historico',            element: <HistoricoScreen /> },
       { path: 'dashboard',  element: <PlaceholderScreen name="Dashboard" /> },
       { path: 'alertas',    element: <PlaceholderScreen name="Alertas" /> },
       { path: 'produccion', element: <PlaceholderScreen name="Producción" /> },
       { path: 'mas',        element: <MasMenu /> },
       { path: 'mas/:screen', element: <MasSubScreen /> },
     ],
+  },
+  {
+    path: '/up/:upId',
+    element: (
+      <ProtectedRoute>
+        <UpDetailScreen />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/up/:upId/trasladar',
+    element: (
+      <ProtectedRoute>
+        <TrasladarUpScreen />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/up/:upId/ralear',
+    element: (
+      <ProtectedRoute>
+        <RalearUpScreen />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/up/:upId/cosechar',
+    element: (
+      <ProtectedRoute>
+        <CosecharUpScreen />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/up/:upId/qr',
+    element: (
+      <ProtectedRoute>
+        <QrPrintScreen />
+      </ProtectedRoute>
+    ),
   },
   {
     path: '*',
